@@ -3,20 +3,37 @@
   "name": "hikaido",
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2026-11-11",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": { "binding": "ASSETS", "directory": ".svelte-kit/cloudflare" },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".svelte-kit/cloudflare"
+  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "hikaido",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "e62629af-b16b-4849-ad77-a420222c0278",
       "migrations_dir": "drizzle"
     }
   ],
   "vars": {
-    "PUBLIC_TURNSTILE_SITE_KEY": "",
-    "TURNSTILE_HOSTNAME": "pl4rd.com",
+    "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAF8bwQRvvc7yEktK",
+    "TURNSTILE_HOSTNAME": "hikaido.pl4rd.com",
     "LOCAL_TEST_MODE": "false"
   },
-  "observability": { "enabled": true, "traces": { "enabled": true } }
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true
+    }
+  },
+  "routes": [
+    {
+      "pattern": "hikaido.pl4rd.com",
+      "custom_domain": true
+    }
+  ],
+  "workers_dev": false
 }

@@ -1,4 +1,4 @@
-import { base } from "./paths";
+import { base, origin } from "./paths";
 export const catchphrase = "あのヒカセンのこと、どのくらいしってる？";
 export function buildMetadata({
   title = "ひかいど | ヒカセンの2択理解度チェック",
@@ -14,7 +14,7 @@ export function buildMetadata({
   return {
     title,
     description,
-    url: `https://pl4rd.com${base}${path}`,
-    image: `https://pl4rd.com${base}${image}`,
+    url: `${origin}${base}${path}`,
+    image: `${origin}${base}${image}`,
   };
 }

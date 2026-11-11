@@ -10,7 +10,7 @@ Catppuccin Latte/MacchiatoのUI。1問1画面、戻る、確認、リアクシ�
 
 ## 配色・共通ナビゲーション（追加指示）
 
-Catppuccin Latte/Macchiatoを採用。アクセントはFlamingo（Latte: #dd7878、Macchiato: #f0c6c6）。ライト側のアクセント文字には濃い派生色（#a34545）、アクセント背景上の文字には#24273aを使い、可読性を確保する。colorant-picker / 4seasonsと同様、48pxヘッダー左にサービス名、右にメニューボタン、右端サイドドロワー、外部ホーム・プライバシーへのリンクを配置。日本語MVPのため言語切替なし。ドロワーはnative dialogでフォーカス制御。ヘッダーのBrandはLucide Heartと「ひかいど」。提供シンボルはfaviconとOGPに使用する。
+Catppuccin Latte/Macchiatoを採用。カララントピッカー・4seasonsと同じニュートラルな配色に統一し、装飾用のアクセントカラーは使わない。ボタンはsubtext1、背景はbase、カードはmantle、境界線はsurface1、フォーカスはグレー系とする。二択・診断タイプの枠も色分けせず、選択状態は枠と背景で示す。colorant-picker / 4seasonsと同様、48pxヘッダー左にサービス名、右にメニューボタン、右端サイドドロワー、外部ホーム・プライバシーへのリンクを配置。日本語MVPのため言語切替なし。ドロワーはnative dialogでフォーカス制御。ヘッダーのBrandはLucide Heartと「ひかいど」。提供シンボルはfaviconとOGPに使用する。
 
 ## 画面表記（追加指示）
 ユーザー向け画面では「管理」という語を使わず、「作ったクイズ」「回答を確認」「回答者を削除」「クイズを削除」と操作を明記する。運営の操作はCLIのみ。
@@ -33,3 +33,15 @@ Catppuccin Latte/Macchiatoを採用。アクセントはFlamingo（Latte: #dd787
 診断問題と重複する通常問題（t009・t010）、t006と重複するt028は削除する。好みや行動の異なる軸を問う設問は残す。
 
 トップの診断紹介は「8つのヒカセンタイプを診断。冒険の楽しみ方が見えてくるかも。」とし、共通4問や全回答についての前置きは表示しない。
+
+## 共通ヘッダーと配色設定
+
+最上部の非公式サービス・無料・ログイン不要の帯は表示しない。ライト／ダークはmode-watcherで管理する。初期値はOS設定に追従し、OS設定変更にも追従する。手動の選択は既存のhikaido-themeキーに保存して再読み込み時にも復元する。メニューからOS設定に戻せる。初期描画前の配色適用とブラウザのtheme-color更新もmode-watcherに任せる。
+
+## 共通お問い合わせへの移行
+
+一般のお問い合わせ導線は https://contact.pl4rd.com/?service=hikaido に統一する。/contact は303で同じ窓口へ誘導する。ひかいど内の一般お問い合わせフォームは廃止するが、既存の受付記録と互換API、通報・通知再送は維持する。共通窓口の公開後に本番の導線を切り替える。
+
+## 本番公開
+
+公開URLは https://hikaido.pl4rd.com/ とする。SvelteKitのbase pathは空文字とし、画面・API・画像・共有ページはサブドメイン直下で配信する。旧pl4rd.com/hikaido向けの互換ルートやリダイレクトは作らない。Turnstileはhikaido専用ウィジェットを用い、本番のhostname検証はhikaido.pl4rd.comのみを許可する。

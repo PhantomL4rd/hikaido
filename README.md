@@ -2,7 +2,7 @@
 
 FF14プレイヤー向けの無料・ログイン不要の2択理解度チェック。自分の答えを正解にした10問または25問のクイズを作り、URLを友達へ共有します。回答後に一致率・問題別統計・出題者のヒカセン8タイプを表示します。
 
-URL: https://pl4rd.com/hikaido · GitHub: [PhantomL4rd/hikaido](https://github.com/PhantomL4rd/hikaido)（public）
+URL: https://hikaido.pl4rd.com · GitHub: [PhantomL4rd/hikaido](https://github.com/PhantomL4rd/hikaido)（public）
 
 ## 技術スタック
 
@@ -37,13 +37,13 @@ pnpm db:migrate:local
 pnpm dev
 ```
 
-http://127.0.0.1:5173/hikaido を開きます。`.dev.vars` の `LOCAL_TEST_MODE=true` はlocalhost/127.0.0.1のときだけTurnstileを省略します。Slack未設定でも通報・お問い合わせはDBとOutboxに保存されます。`.dev.vars` はGit対象外です。リクエスト本文は64KiBまで。
+http://127.0.0.1:5173/ を開きます。`.dev.vars` の `LOCAL_TEST_MODE=true` はlocalhost/127.0.0.1のときだけTurnstileを省略します。Slack未設定でも通報・お問い合わせはDBとOutboxに保存されます。`.dev.vars` はGit対象外です。リクエスト本文は64KiBまで。
 
 ローカルデータは `.wrangler/state` に保存されます。クイズ削除と回答者削除は取り消せません。下書き、作ったクイズと削除権限、回答済み記録・結果閲覧権限はブラウザのlocalStorageに保存され、他端末への復旧機能はありません。
 
 ## D1とマイグレーション
 
-`wrangler.jsonc` のD1 IDはローカル用プレースホルダーです。本番リソース作成は所有者の承認後に行ってください。
+`wrangler.jsonc` のD1 IDは本番のhikaidoを指します。ローカル開発では同じバインディング名のローカルD1を使用します。
 
 ```sh
 pnpm exec wrangler whoami
@@ -59,7 +59,7 @@ pnpm db:migrate:remote
 
 ## Secrets / Turnstile
 
-Cloudflare DashboardでTurnstileウィジェットを作成し、本番のホストを `pl4rd.com` にします。公開sitekeyを `PUBLIC_TURNSTILE_SITE_KEY` に設定し、`TURNSTILE_HOSTNAME=pl4rd.com`、`LOCAL_TEST_MODE=false` を維持します。サーバー側でsuccess・action・hostnameを照合します。トークンは1回ごとに更新します。
+Cloudflare DashboardでTurnstileウィジェットを作成し、本番のホストを `hikaido.pl4rd.com` にします。公開sitekeyを `PUBLIC_TURNSTILE_SITE_KEY` に設定し、`TURNSTILE_HOSTNAME=hikaido.pl4rd.com`、`LOCAL_TEST_MODE=false` を維持します。サーバー側でsuccess・action・hostnameを照合します。トークンは1回ごとに更新します。
 
 ```sh
 # 本番へのSecret設定も所有者の承認後。値は対話入力し履歴やGitに残さない
@@ -130,7 +130,7 @@ pnpm exec wrangler deploy --dry-run
 pnpm exec wrangler deploy
 ```
 
-`pl4rd.com` の既存サイトを維持したまま配信するため、本番設定へ `routes: [{"pattern":"pl4rd.com/hikaido*","zone_name":"pl4rd.com"}]` を追加してください。対象ゾーンの管理権限と既存ルートの競合を確認します。SvelteKitのbase pathは `/hikaido` です。Workers Logs/Tracesを有効化していますが、トークン・ユーザー入力・Webhook URLをアプリのログへ出力しません。
+`hikaido.pl4rd.com` をWorkersのCustom Domainとして配信します。対象ゾーンは `pl4rd.com`、SvelteKitのbase pathは空文字です。旧URL向けの互換ルートは追加しません。Workers Logs/Tracesを有効化していますが、トークン・ユーザー入力・Webhook URLをアプリのログへ出力しません。
 
 クイズページはnoindex、秘密付き結果とAPIはno-store。OGPは提供ブランド素材をもとに、クイズ名・問題数や結果の得点を反映した1200×630 PNGをWorkersで動的生成します。共通画像は `static/og-default.png` です。Web Share非対応ブラウザではURLコピーを使います。URLを知る全員が遊べる仕様で、完全なネタバレ防止・別端末での重複回答防止は行いません。
 
@@ -148,10 +148,10 @@ pnpm exec wrangler deploy
 
 トップのキャッチコピーは「あのヒカセンのこと、どのくらいしってる？」。操作・診断アイコンはLucideに統一しています。
 
-- 共通画像: `/hikaido/og-default.png`
-- クイズ画像: `/hikaido/og/quiz/<quizId>`（出題者名と問題数だけ）
-- 結果共有ページ: `/hikaido/share/<shareId>`
-- 結果画像: `/hikaido/og/result/<shareId>`（出題者名・得点・問題数だけ）
+- 共通画像: `/og-default.png`
+- クイズ画像: `/og/quiz/<quizId>`（出題者名と問題数だけ）
+- 結果共有ページ: `/share/<shareId>`
+- 結果画像: `/og/result/<shareId>`（出題者名・得点・問題数だけ）
 
 結果画面で「結果を共有」を押すと、結果閲覧の秘密を検証した後、独立した公開用IDを発行します。共有ページに回答者名・タイプ・各問題の回答・正解を含めません。回答やクイズの削除で共有IDもCASCADE削除し、非表示時も404になります。OG画像は存在確認後に内部キャッシュを参照し、クライアントにはno-storeを返します。SNS側で取得済みの画像キャッシュは本サービスから消去できません。
 
@@ -161,9 +161,11 @@ Satori 0.12.2のWASM版・Yoga・resvgのWASMを使用し、ViteではNodeでWAS
 pnpm brand:generate -- --previews # 共通画像・favicon・埋め込みフォント・確認画像を再生成
 pnpm db:migrate:local            # result_sharesを追加
 pnpm build
-pnpm dev:worker                  # http://127.0.0.1:8788/hikaido/ で実Worker確認
+pnpm dev:worker                  # http://127.0.0.1:8788/ で実Worker確認
 ```
 
 詳しい素材構成は `docs/brand.md` を参照してください。
 
 着想元：[リカイド](https://rikaido.me/)（体験の構造を参考にしています）。
+
+一般のお問い合わせは `https://contact.pl4rd.com/?service=hikaido` の共通窓口へ誘導します。`/contact` は同じURLへ303で誘導します。ひかいどのSlack設定は通報・旧APIの通知に引き続き使用します。共通窓口は隣の `../contact`（Hono）で独立して管理します。

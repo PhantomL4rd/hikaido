@@ -216,11 +216,7 @@ function url() {
 {:else if stage === "review"}
   <h1>これが、あなたの2択。</h1>
   {#if type}
-    <section
-      class="card type"
-      style:border-color={type.color}
-      in:fade={{ duration: reduced ? 0 : 180 }}
-    >
+    <section class="card type" in:fade={{ duration: reduced ? 0 : 180 }}>
       <span class="type-icon"><Icon name={type.icon} size={48} /></span>
       <p>{name}のヒカセンタイプ</p>
       <h2>{type.name}</h2>

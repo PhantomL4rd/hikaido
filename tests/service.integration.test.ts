@@ -27,7 +27,7 @@ let config: Env;
 let serial = 0;
 const waits: Promise<unknown>[] = [];
 function event(body?: unknown, token?: string, search = ""): ServiceEvent {
-  const url = new URL(`http://localhost/hikaido/api/test${search}`);
+  const url = new URL(`http://localhost/api/test${search}`);
   return {
     request: new Request(url, {
       method: body ? "POST" : "GET",

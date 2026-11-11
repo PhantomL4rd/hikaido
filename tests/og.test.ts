@@ -36,7 +36,7 @@ it("OGPとXに絶対URLと個別タイトルを使う", () => {
     path: "/q/abc",
     image: "/og/quiz/abc",
   });
-  expect(data.url).toBe("https://pl4rd.com/hikaido/q/abc");
-  expect(data.image).toBe("https://pl4rd.com/hikaido/og/quiz/abc");
+  expect(data.url).toBe("https://hikaido.pl4rd.com/q/abc");
+  expect(data.image).toBe("https://hikaido.pl4rd.com/og/quiz/abc");
   expect(data.title).toContain("ひろし");
 });

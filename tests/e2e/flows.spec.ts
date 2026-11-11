@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { templates } from "../../src/lib/templates";
 
-const root = "/hikaido";
+const root = "";
 const headers = { origin: "http://127.0.0.1:5174" };
 async function publish(
   request: import("@playwright/test").APIRequestContext,
@@ -89,7 +89,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
   expect(publicHtml).not.toContain("correctChoice");
   expect(publicHtml).not.toContain("selectedChoice");
   const shareId = new URL(sharedUrl).pathname.split("/").at(-1);
-  const sharedImage = await page.request.get(`/hikaido/og/result/${shareId}`);
+  const sharedImage = await page.request.get(`/og/result/${shareId}`);
   expect(sharedImage.status()).toBe(200);
   expect((await sharedImage.body()).readUInt32BE(16)).toBe(1200);
   const resultUrl = friend.url();
@@ -99,9 +99,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
   await page.getByRole("button", { name: "削除する", exact: true }).click();
   await expect(page.getByText("まだ回答がありません。")).toBeVisible();
   expect((await page.request.get(sharedUrl)).status()).toBe(404);
-  expect(
-    (await page.request.get(`/hikaido/og/result/${shareId}`)).status(),
-  ).toBe(404);
+  expect((await page.request.get(`/og/result/${shareId}`)).status()).toBe(404);
   await friend.goto(resultUrl);
   await expect(friend.getByRole("alert")).toContainText("結果が見つかりません");
   expect(ownerState).toBeTruthy();
@@ -216,14 +214,15 @@ test("通報・連投制限とお問い合わせを受け付ける", async ({ re
       })
     ).status(),
   ).toBe(400);
-  await page.goto(`${root}/contact`);
-  await page
-    .getByLabel("本文（1000文字以内）")
-    .fill("フォームからのお問い合わせです");
-  await page.getByRole("button", { name: "送信する" }).click();
+  const contact = await request.get(`${root}/contact`, { maxRedirects: 0 });
+  expect(contact.status()).toBe(303);
+  expect(contact.headers().location).toBe(
+    "https://contact.pl4rd.com/?service=hikaido",
+  );
+  await page.goto(`${root}/`);
   await expect(
-    page.getByRole("heading", { name: "受け付けました" }),
-  ).toBeVisible();
+    page.locator("footer").getByRole("link", { name: "お問い合わせ" }),
+  ).toHaveAttribute("href", "https://contact.pl4rd.com/?service=hikaido");
 
   await request.delete(`${root}/api/quizzes/${q.id}`, {
     headers: { ...headers, authorization: `Bearer ${q.token}` },

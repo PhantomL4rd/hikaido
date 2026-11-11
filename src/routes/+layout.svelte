@@ -1,5 +1,12 @@
 <script lang="ts">
 import "../app.css";
+import {
+  ModeWatcher,
+  mode,
+  setMode,
+  toggleMode,
+  userPrefersMode,
+} from "mode-watcher";
 import { onMount } from "svelte";
 import Brand from "#lib/components/Brand.svelte";
 import Icon from "#lib/components/Icon.svelte";
@@ -12,28 +19,20 @@ const navigation = [
   ["/create", "クイズを作る", "Plus"],
   ["/manage", "作ったクイズ", "List"],
   ["/about", "このサイトについて", "Info"],
-  ["/contact", "お問い合わせ", "Mail"],
 ] as const;
 let { children } = $props();
 let drawer: HTMLDialogElement;
-let dark = $state(false);
 let ready = $state(false);
 onMount(() => {
   ready = true;
-  dark =
-    localStorage.getItem("hikaido-theme") === "dark" ||
-    (!localStorage.getItem("hikaido-theme") &&
-      matchMedia("(prefers-color-scheme: dark)").matches);
-  document.documentElement.classList.toggle("dark", dark);
 });
-function theme() {
-  dark = !dark;
-  document.documentElement.classList.toggle("dark", dark);
-  localStorage.setItem("hikaido-theme", dark ? "dark" : "light");
-}
 </script>
-<svelte:head
-  ><meta name="theme-color" content="#eff1f5">
+<ModeWatcher
+  modeStorageKey="hikaido-theme"
+  lightClassNames={["light"]}
+  themeColors={{ light: "#eff1f5", dark: "#24273a" }}
+/>
+<svelte:head>
   <link rel="icon" href={`${base}/favicon.ico`} sizes="any">
   <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml">
   <link
@@ -45,7 +44,6 @@ function theme() {
   !page.url.pathname.startsWith(`${base}/share/`)}
   <Metadata path={page.url.pathname.slice(base.length) || "/"} />
 {/if}
-<div class="notice">FFXIVファンによる非公式サービス · 無料・ログイン不要</div>
 <header>
   <div class="header-inner">
     <a class="home-link" href={`${base}/`}><Brand /></a>
@@ -53,11 +51,11 @@ function theme() {
       <button
         type="button"
         class="icon-button"
-        onclick={theme}
+        onclick={toggleMode}
         aria-label="配色を切り替える"
         disabled={!ready}
       >
-        <Icon name={dark ? "Sun" : "Moon"} />
+        <Icon name={mode.current === "dark" ? "Sun" : "Moon"} />
       </button><button
         type="button"
         class="icon-button"
@@ -98,7 +96,26 @@ function theme() {
         ><Icon name={icon} />{label}</a
       >
     {/each}
+    <a
+      href="https://contact.pl4rd.com/?service=hikaido"
+      onclick={() => drawer.close()}
+      ><Icon name="Mail" />お問い合わせ</a
+    >
     <hr>
+    <label for="color-mode">配色設定</label>
+    <select
+      id="color-mode"
+      value={userPrefersMode.current}
+      onchange={(event) => {
+        const value = event.currentTarget.value;
+        if (value === "system" || value === "light" || value === "dark")
+          setMode(value);
+      }}
+    >
+      <option value="system">OS設定に合わせる</option>
+      <option value="light">ライト</option>
+      <option value="dark">ダーク</option>
+    </select>
     <small>リンク</small
     ><a href="https://pl4rd.com/" target="_blank" rel="noreferrer"
       ><Icon name="House" />ホーム<Icon name="ExternalLink" size={14} /></a
@@ -113,7 +130,7 @@ function theme() {
 <main>{@render children()}</main>
 <footer>
   <a href={`${base}/about`}>このサイトについて</a><span> · </span
-  ><a href={`${base}/contact`}>お問い合わせ</a>
+  ><a href="https://contact.pl4rd.com/?service=hikaido">お問い合わせ</a>
   <p>HIKAIDO · FINAL FANTASY XIV 非公式ファンサービス</p>
   <p>
     着想元：<a href="https://rikaido.me/" target="_blank" rel="noreferrer"

@@ -6,7 +6,7 @@ export default defineConfig({
   use: { baseURL: "http://127.0.0.1:5174", headless: true },
   webServer: {
     command: "pnpm exec tsx scripts/e2e-server.ts",
-    url: "http://127.0.0.1:5174/hikaido",
+    url: "http://127.0.0.1:5174/",
     reuseExistingServer: false,
   },
   timeout: 60000,

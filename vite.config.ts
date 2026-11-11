@@ -26,7 +26,7 @@ export default defineConfig(({ command }) => ({
           ? { persist: { path: process.env.HIKAIDO_DB_DIR } }
           : undefined,
       }),
-      paths: { base: "/hikaido" },
+      paths: { base: "" },
     }),
   ],
   test: { include: ["tests/**/*.test.ts"] },

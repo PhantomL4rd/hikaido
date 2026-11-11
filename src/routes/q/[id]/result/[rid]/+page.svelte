@@ -101,11 +101,7 @@ const type = $derived(types.find((t) => t.id === data?.type));
     {/if}
   </section>
   {#if type}
-    <section
-      class="card type"
-      style:border-color={type.color}
-      in:fade={{ duration: reduced ? 0 : 180 }}
-    >
+    <section class="card type" in:fade={{ duration: reduced ? 0 : 180 }}>
       <div class="type-icon"><Icon name={type.icon} size={48} /></div>
       <p>{data.quiz.characterName}のヒカセンタイプ</p>
       <h2>{type.name}</h2>

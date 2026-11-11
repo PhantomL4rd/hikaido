@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { templates } from "../../src/lib/templates";
 
-const root = "/hikaido";
+const root = "";
 test("文言・Lucideハート・favicon・共通OGPをSSRで返す", async ({
   page,
   request,
 }) => {
-  await page.goto(root);
+  await page.goto(`${root}/`);
   await expect(page.locator("header")).toContainText("ひかいど");
   await expect(page.locator("header")).not.toContainText("HIKAIDO");
   await expect(page.locator("header .lucide-heart")).toHaveCount(1);
@@ -21,9 +21,9 @@ test("文言・Lucideハート・favicon・共通OGPをSSRで返す", async ({
   await expect(page.getByText("A LITTLE QUIZ, A NEW DISCOVERY.")).toHaveCount(
     0,
   );
-  const html = await (await request.get(root)).text();
+  const html = await (await request.get(`${root}/`)).text();
   expect((html.match(/property="og:image"/g) || []).length).toBe(1);
-  expect(html).toContain("https://pl4rd.com/hikaido/og-default.png");
+  expect(html).toContain("https://hikaido.pl4rd.com/og-default.png");
   expect(
     (await request.get(`${root}/favicon.svg`)).headers()["content-type"],
   ).toContain("image/svg+xml");
@@ -58,7 +58,7 @@ test("クイズ別OGPは1200×630のPNGを生成し削除後は配信しない",
   expect(published.status()).toBe(201);
   const { id } = await published.json();
   const html = await (await request.get(`${root}/q/${id}`)).text();
-  expect(html).toContain(`https://pl4rd.com/hikaido/og/quiz/${id}`);
+  expect(html).toContain(`https://hikaido.pl4rd.com/og/quiz/${id}`);
   expect((html.match(/property="og:image"/g) || []).length).toBe(1);
   expect(html).toContain("朝比奈 ひかり理解度チェック");
   const image = await request.get(`${root}/og/quiz/${id}`);

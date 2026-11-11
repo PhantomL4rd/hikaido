@@ -23,6 +23,9 @@ importers:
       drizzle-orm:
         specifier: latest
         version: 0.45.4(@cloudflare/workers-types@5.20261110.1)
+      mode-watcher:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.57.3)
       satori:
         specifier: 0.12.2
         version: 0.12.2
@@ -1393,6 +1396,9 @@ packages:
     resolution: {integrity: sha512-Ox1pJVrDCyGHMG9CFg1tmrRUMRPRsAWYc/PinY0XzJU4K7y7vjNoLKIQ7BR5UJMCxNN8EM1MNDmHWA/B3aZUuw==}
     engines: {node: '>=6'}
 
+  inline-style-parser@0.2.7:
+    resolution: {integrity: sha512-Nb2ctOyNR8DqQoR0OwRG95uNWIC0C1lCgf5Naz5H6Ji72KZ8OcFZLz2P5sNgwlyoJ8Yif11oMuYs5pBQa86csA==}
+
   is-reference@3.0.3:
     resolution: {integrity: sha512-ixkJoqQvAP88E6wLydLGGqCJsrFUnqoH6HnaczB8XmDH1oaWU+xxdptvikTgaEhtZ53Ky6YXiBuUI2WXLMCwjw==}
 
@@ -1495,6 +1501,11 @@ packages:
       kerberos:
         optional: true
 
+  mode-watcher@1.1.0:
+    resolution: {integrity: sha512-mUT9RRGPDYenk59qJauN1rhsIMKBmWA3xMF+uRwE8MW/tjhaDSCCARqkSuDTq8vr4/2KcAxIGVjACxTjdk5C3g==}
+    peerDependencies:
+      svelte: ^5.27.0
+
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
@@ -1571,6 +1582,16 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
+  runed@0.23.4:
+    resolution: {integrity: sha512-9q8oUiBYeXIDLWNK5DfCWlkL0EW3oGbk845VdKlPeia28l751VpfesaB/+7pI6rnbx1I6rqoZ2fZxptOJLxILA==}
+    peerDependencies:
+      svelte: ^5.7.0
+
+  runed@0.25.0:
+    resolution: {integrity: sha512-7+ma4AG9FT2sWQEA0Egf6mb7PBT2vHyuHail1ie8ropfSjvZGtEAx8YTmUjv/APCsdRRxEVvArNjALk9zFSOrg==}
+    peerDependencies:
+      svelte: ^5.7.0
+
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
@@ -1614,6 +1635,9 @@ packages:
   string.prototype.codepointat@0.2.1:
     resolution: {integrity: sha512-2cBVCj6I4IOvEnjgO/hWqXjqBGsY+zwPmHl12Srk9IXSZ56Jwwmy+66XO5Iut/oQVR7t5ihYdLB0GMa4alEUcg==}
 
+  style-to-object@1.0.14:
+    resolution: {integrity: sha512-LIN7rULI0jBscWQYaSswptyderlarFkjQ+t79nzty8tcIAceVomEVlLzH5VP4Cmsv6MtKhs7qaAiwlcp+Mgaxw==}
+
   subset-font@2.9.0:
     resolution: {integrity: sha512-WJulQeFwbewrXIGcLJbSZFWI44fHW8gNRuPzLywfDL8w38IPRbN1JFxwG76aoohw9kcFdvjVIn2QmID1iy119A==}
 
@@ -1628,6 +1652,12 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: ^5.0.0 || ^6.0.0
+
+  svelte-toolbelt@0.7.1:
+    resolution: {integrity: sha512-HcBOcR17Vx9bjaOceUvxkY3nGmbBmCBBbuWLLEWO6jtmWH8f/QoWmbyUfQZrpDINH39en1b8mptfPQT9VKQ1xQ==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte@5.57.3:
     resolution: {integrity: sha512-5mAftM3SoDV9X0zdF386F9p2pv8iKOwi/KfBS1XnBAkVCKFzVOLHUoa8iGWAt4buoicLmyWVRpuuD5wplXOQsg==}
@@ -2667,6 +2697,8 @@ snapshots:
 
   hex-rgb@4.3.0: {}
 
+  inline-style-parser@0.2.7: {}
+
   is-reference@3.0.3:
     dependencies:
       '@types/estree': 1.0.10
@@ -2750,6 +2782,12 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  mode-watcher@1.1.0(svelte@5.57.3):
+    dependencies:
+      runed: 0.25.0(svelte@5.57.3)
+      svelte: 5.57.3
+      svelte-toolbelt: 0.7.1(svelte@5.57.3)
+
   mri@1.2.0: {}
 
   mrmime@2.0.1: {}
@@ -2819,6 +2857,16 @@ snapshots:
       '@rolldown/binding-openharmony-arm64': 1.2.18
       '@rolldown/binding-win32-arm64-msvc': 1.2.18
       '@rolldown/binding-win32-x64-msvc': 1.2.18
+
+  runed@0.23.4(svelte@5.57.3):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.57.3
+
+  runed@0.25.0(svelte@5.57.3):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.57.3
 
   sade@1.8.1:
     dependencies:
@@ -2892,6 +2940,10 @@ snapshots:
 
   string.prototype.codepointat@0.2.1: {}
 
+  style-to-object@1.0.14:
+    dependencies:
+      inline-style-parser: 0.2.7
+
   subset-font@2.9.0:
     dependencies:
       fontverter: 2.0.0
@@ -2912,6 +2964,13 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - picomatch
+
+  svelte-toolbelt@0.7.1(svelte@5.57.3):
+    dependencies:
+      clsx: 2.1.1
+      runed: 0.23.4(svelte@5.57.3)
+      style-to-object: 1.0.14
+      svelte: 5.57.3
 
   svelte@5.57.3:
     dependencies:

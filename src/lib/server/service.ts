@@ -3,6 +3,7 @@ import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import { diagnose, reaction, statistics } from "#lib/domain";
+import { origin } from "#lib/paths";
 import { templates } from "#lib/templates";
 import {
   answerSchema,
@@ -369,7 +370,7 @@ export async function report(e: ServiceEvent) {
       eventType: "report",
       referenceId: id,
       createdAt: now,
-      payload: `通報 ${d.targetType}\n理由: ${d.reason}\n対象: ${name}\nクイズID: ${d.quizId}\nhttps://pl4rd.com/hikaido/q/${d.quizId}\n日時: ${new Date(now).toISOString()}\n通報ID: ${id}`,
+      payload: `通報 ${d.targetType}\n理由: ${d.reason}\n対象: ${name}\nクイズID: ${d.quizId}\n${origin}/q/${d.quizId}\n日時: ${new Date(now).toISOString()}\n通報ID: ${id}`,
     }),
   ]);
   e.locals.waitUntil(retryNotifications(env(e)));

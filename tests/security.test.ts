@@ -41,13 +41,13 @@ it("Slackのメンションやリンク記法を無効化する", () => {
 it("Turnstileはaction・hostname不一致と通信失敗を拒否する", async () => {
   const { turnstile } = await import("../src/lib/server/security");
   const event = {
-    url: new URL("https://pl4rd.com/hikaido"),
+    url: new URL("https://hikaido.pl4rd.com/"),
     locals: {
       env: {
         DB: {},
         LOCAL_TEST_MODE: "false",
         TURNSTILE_SECRET_KEY: "test-only",
-        TURNSTILE_HOSTNAME: "pl4rd.com",
+        TURNSTILE_HOSTNAME: "hikaido.pl4rd.com",
       },
     },
   } as import("../src/lib/server/security").ServiceEvent;
@@ -58,7 +58,7 @@ it("Turnstileはaction・hostname不一致と通信失敗を拒否する", async
       JSON.stringify({
         success: true,
         action: "report",
-        hostname: "pl4rd.com",
+        hostname: "hikaido.pl4rd.com",
       }),
     ),
   );
@@ -66,8 +66,8 @@ it("Turnstileはaction・hostname不一致と通信失敗を拒否する", async
     turnstile(event, "fresh-token", "report"),
   ).resolves.toBeUndefined();
   for (const payload of [
-    { success: false, action: "report", hostname: "pl4rd.com" },
-    { success: true, action: "answer", hostname: "pl4rd.com" },
+    { success: false, action: "report", hostname: "hikaido.pl4rd.com" },
+    { success: true, action: "answer", hostname: "hikaido.pl4rd.com" },
     { success: true, action: "report", hostname: "evil.test" },
   ]) {
     send.mockResolvedValue(new Response(JSON.stringify(payload)));

@@ -106,9 +106,22 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     .getByRole("link", { name: "フレンドのこたえをみる", exact: true })
     .click();
   await expect(page.getByText("友達", { exact: true })).toBeVisible();
+  const questionStats = page
+    .locator("section")
+    .filter({ has: page.getByRole("heading", { name: "問題ごとの正答率" }) });
+  await expect(questionStats.getByRole("listitem")).toHaveCount(10);
+  await expect(
+    questionStats.getByText("正答率 100%", { exact: true }),
+  ).toHaveCount(10);
+  await expect(
+    questionStats.getByText("1人中1人が正解", { exact: false }),
+  ).toHaveCount(10);
   await page.getByRole("button", { name: "回答者を削除" }).click();
   await page.getByRole("button", { name: "削除する", exact: true }).click();
-  await expect(page.getByText("まだ回答がありません。")).toBeVisible();
+  await expect(
+    page.getByText("まだ回答がありません。", { exact: true }),
+  ).toHaveCount(11);
+  await expect(questionStats.getByText(/正答率 \d+%/)).toHaveCount(0);
   expect((await page.request.get(sharedUrl)).status()).toBe(404);
   expect((await page.request.get(`/og/result/${shareId}`)).status()).toBe(404);
   await friend.goto(resultUrl);

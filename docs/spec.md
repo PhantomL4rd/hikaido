@@ -45,3 +45,7 @@ Catppuccin Latte/Macchiatoを採用。カララントピッカー・4seasonsと�
 ## 本番公開
 
 公開URLは https://hikaido.pl4rd.com/ とする。SvelteKitのbase pathは空文字とし、画面・API・画像・共有ページはサブドメイン直下で配信する。旧pl4rd.com/hikaido向けの互換ルートやリダイレクトは作らない。Turnstileはhikaido専用ウィジェットを用い、本番のhostname検証はhikaido.pl4rd.comのみを許可する。
+
+## Observability
+
+Cloudflare Observabilityは使用しない。Workers Logs・Tracesとも無効とし、今後の設定追加でも有効化しない。

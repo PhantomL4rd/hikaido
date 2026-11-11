@@ -130,7 +130,7 @@ pnpm exec wrangler deploy --dry-run
 pnpm exec wrangler deploy
 ```
 
-`hikaido.pl4rd.com` をWorkersのCustom Domainとして配信します。対象ゾーンは `pl4rd.com`、SvelteKitのbase pathは空文字です。旧URL向けの互換ルートは追加しません。Workers Logs/Tracesを有効化していますが、トークン・ユーザー入力・Webhook URLをアプリのログへ出力しません。
+`hikaido.pl4rd.com` をWorkersのCustom Domainとして配信します。対象ゾーンは `pl4rd.com`、SvelteKitのbase pathは空文字です。旧URL向けの互換ルートは追加しません。Cloudflare Observability（Workers Logs/Traces）は無効です。トークン・ユーザー入力・Webhook URLをアプリのログへ出力しません。
 
 クイズページはnoindex、秘密付き結果とAPIはno-store。OGPは提供ブランド素材をもとに、クイズ名・問題数や結果の得点を反映した1200×630 PNGをWorkersで動的生成します。共通画像は `static/og-default.png` です。Web Share非対応ブラウザではURLコピーを使います。URLを知る全員が遊べる仕様で、完全なネタバレ防止・別端末での重複回答防止は行いません。
 

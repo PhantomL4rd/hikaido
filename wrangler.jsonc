@@ -24,9 +24,13 @@
     "LOCAL_TEST_MODE": "false"
   },
   "observability": {
-    "enabled": true,
+    "enabled": false,
+    "logs": {
+      "enabled": false,
+      "invocation_logs": false
+    },
     "traces": {
-      "enabled": true
+      "enabled": false
     }
   },
   "routes": [

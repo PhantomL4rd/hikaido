@@ -29,7 +29,7 @@ async function send() {
 <h1>名前を通報</h1>
 {#if done}
   <section class="card">
-    <p>通報を受け付けました。運営が確認します。</p>
+    <p>お知らせありがとうございます。運営で確認します。</p>
   </section>
 {:else}
   <form
@@ -39,7 +39,7 @@ async function send() {
       void send();
     }}
   >
-    <p>不適切な名前について、運営にお知らせください。</p>
+    <p>気になる名前を見つけたら、理由を選んで教えてください。</p>
     <label for="reason">通報理由</label
     ><select id="reason" bind:value={reason}>
       <option>不適切な名前</option>

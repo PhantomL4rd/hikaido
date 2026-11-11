@@ -16,7 +16,8 @@ let { data } = $props();
 <span class="eyebrow">FRIENDS' RESULTS</span>
 <h1>{data.quiz.characterName}の回答者一覧</h1>
 <p class="muted">
-  全{data.page.total}人 · 新着順 · 各問題への回答内容は公開されません。
+  全{data.page.total}人 ·
+  新しく答えた人から並んでいます。どの答えを選んだかは、ここには載りません。
 </p>
 <section class="card">
   <ul class="list">

@@ -24,7 +24,8 @@ onMount(async () => {
     null,
   );
   if (!saved) {
-    message = "この端末に結果の閲覧情報がありません。";
+    message =
+      "このブラウザには、結果を開くための情報が見つかりませんでした。答えたときのブラウザで開いてみてね。";
     return;
   }
   accessToken = saved.resultToken;
@@ -77,7 +78,7 @@ const type = $derived(types.find((t) => t.id === data?.type));
     </p>
     <p>
       <small
-        >結果を共有すると、出題者名と得点が公開されます。各問題への回答は公開しません。</small
+        >共有したページには、クイズを作った人の名前とあなたの点数が載ります。どの答えを選んだかは載らないので、結果だけシェアできます。</small
       >
     </p>
     {#if sharePath}
@@ -106,7 +107,9 @@ const type = $derived(types.find((t) => t.id === data?.type));
       <p>{data.quiz.characterName}のヒカセンタイプ</p>
       <h2>{type.name}</h2>
       <p>{type.description}</p>
-      <small>出題者本人の回答から判定した、娯楽目的の診断です。</small>
+      <small
+        >クイズを作った本人の答えから見つけたタイプです。仲間と気軽に楽しんでね。</small
+      >
     </section>
   {/if}
   <section class="card">
@@ -114,7 +117,7 @@ const type = $derived(types.find((t) => t.id === data?.type));
     {#each data.questions as q, i}
       <article class="result-question">
         <span class="pill"
-          >{q.selectedChoice === q.correctChoice ? "一致！" : "不一致"}
+          >{q.selectedChoice === q.correctChoice ? "一致！" : "おしい！"}
           · 正答率 {q.stats.correctRate}%</span
         >
         <h3>{i + 1}. {q.question}</h3>
@@ -144,7 +147,7 @@ const type = $derived(types.find((t) => t.id === data?.type));
                 q.stats.total / 2
               ? "多数派"
               : "少数派"}
-          · 有効回答 {q.stats.total}人</small
+          · 集計した回答 {q.stats.total}人</small
         >
       </article>
     {/each}

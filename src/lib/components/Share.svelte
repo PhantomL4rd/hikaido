@@ -18,7 +18,8 @@ async function share() {
     }
   } catch (e) {
     if ((e as Error).name !== "AbortError")
-      message = "共有できませんでした。URLを手動でコピーしてください。";
+      message =
+        "うまく共有できませんでした。URLをコピーして、仲間に送ってみてね。";
   }
 }
 </script>

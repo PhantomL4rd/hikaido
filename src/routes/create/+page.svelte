@@ -197,8 +197,7 @@ function url() {
         class="reroll-button"
         onclick={() => {
           const next = replaceQuestion(draft, position);
-          message =
-            next === draft ? "別の問題の候補をすべて使っています。" : "";
+          message = next === draft ? "選べる問題は、これですべてです。" : "";
           draft = next;
         }}
       >
@@ -235,7 +234,7 @@ function url() {
       <p>{name}のヒカセンタイプ</p>
       <h2>{type.name}</h2>
       <p>{type.description}</p>
-      <small>娯楽目的の診断です。</small>
+      <small>遊び方や好みから見つける、気軽なタイプ診断です。</small>
     </section>
   {/if}
   <section class="card">
@@ -265,11 +264,12 @@ function url() {
       </button>
     </p>
     <p>
-      公開する前に、問題と正解を確認してください。公開後の変更はできません。クイズはURLを知っている方なら、どなたでも楽しめます。
+      問題と答えはこれでOK？
+      公開すると変更できなくなるので、ここで確認してね。URLを知っている人なら、誰でも遊べます。
     </p>
     <p>
       <small
-        >クイズを削除するための情報は、このブラウザに保存されます。ブラウザのデータを消すと、あとからクイズを削除できなくなるのでご注意ください。</small
+        >あとからクイズを削除できるように、このブラウザに情報を保存します。ブラウザのデータを消すと削除できなくなるので、そのまま残しておいてね。</small
       >
     </p>
     <Turnstile
@@ -301,7 +301,7 @@ function url() {
             await copy(url());
             message = "URLをコピーしました";
           } catch {
-            message = "上のURLを選択してコピーしてください";
+            message = "上のURLを選んでコピーしてみてね。";
           }
         }}
       >

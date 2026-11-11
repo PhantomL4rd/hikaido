@@ -62,6 +62,12 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
   const friend = await challenger.newPage();
   await friend.goto(href!);
   await expect(friend.getByText("バトルジャンキー")).toHaveCount(0);
+  await expect(
+    friend.getByText(/名前・正解数・理解度・答えた日時.*一覧は誰でも見られる/),
+  ).toBeVisible();
+  await expect(
+    friend.getByText(/本人の答えとどれくらい同じだったか/),
+  ).toBeVisible();
   await friend.getByLabel("回答者名").fill("友達");
   await friend.getByRole("button", { name: "挑戦する" }).click();
   for (let i = 0; i < 10; i++) {

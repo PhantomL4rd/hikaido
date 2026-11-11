@@ -32,7 +32,8 @@ onMount(() => {
     (q) => q.id === page.params.id,
   );
   if (!owned) {
-    message = "この端末に削除に必要な情報がありません。";
+    message =
+      "このブラウザには、クイズを開くための情報が見つかりませんでした。作ったときのブラウザで開いてみてね。";
     return;
   }
   void refresh();
@@ -74,7 +75,9 @@ async function remove() {
 {#if data}
   <h1>{data.characterName}の作ったクイズ</h1>
   <section class="card">
-    <p>公開済みの問題・正解は変更できません。</p>
+    <p>
+      公開した問題と答えは、あとから変更できません。新しく作りたいときは「クイズを作る」からどうぞ。
+    </p>
     <Share
       quizId={data.id}
       text={`${data.characterName}のこと、どのくらいしってる？`}
@@ -84,7 +87,7 @@ async function remove() {
     <h2>回答者一覧 <small>{data.total}人</small></h2>
     <p>
       <small
-        >削除すると、その回答の結果URLも無効になり統計が更新されます。</small
+        >回答を削除すると、その人の結果ページも見られなくなります。みんなの回答の集計からも外れます。</small
       >
     </p>
     <ul class="list">
@@ -130,9 +133,9 @@ async function remove() {
     {target ? "この回答者を削除しますか？" : "クイズ全体を削除しますか？"}
   </h2>
   <p>
-    削除は取り消せません。{target
-      ? "回答内容と結果が削除されます。"
-      : "すべての回答も削除されます。"}
+    一度消すと元には戻せません。{target
+      ? "この人の回答と結果を削除します。"
+      : "このクイズに届いた回答もすべて削除します。"}
   </p>
   <div class="actions">
     <button type="button" disabled={busy} onclick={() => confirmDialog.close()}>

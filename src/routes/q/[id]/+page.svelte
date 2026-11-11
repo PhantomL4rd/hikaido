@@ -87,7 +87,8 @@ async function choose(choice: Choice) {
     );
     reaction = r.reaction;
   } catch {
-    reaction = "集計を取得できませんでした。回答は保存されています。";
+    reaction =
+      "みんなの予想を読み込めませんでした。あなたの答えは保存されているので、そのまま続けてね。";
   } finally {
     reacting = false;
   }
@@ -146,7 +147,7 @@ async function submit() {
   </section>
   {#if existing}
     <div class="card">
-      <p>この端末では回答済みです。</p>
+      <p>このブラウザでは、もう答えているみたい。結果を見てみよう！</p>
       <a
         class="button primary full"
         href={`${base}/q/${data.quiz.id}/result/${existing}`}
@@ -172,7 +173,7 @@ async function submit() {
       >
       <p>
         <small
-          >回答者名・正解数・理解度・回答日時は、誰でも見られる回答者一覧に公開されます。</small
+          >答えたあとは、名前・正解数・理解度・答えた日時が回答者一覧に載ります。一覧は誰でも見られるので、公開してもよい名前で遊んでね。</small
         >
       </p>
       <button type="submit" class="primary full">
@@ -189,7 +190,9 @@ async function submit() {
     >
   </p>
   <p class="text-center muted">
-    <small>URLを知る人は誰でも遊べます。理解度は回答が一致した割合です。</small>
+    <small
+      >URLを知っていれば、誰でも遊べます。「理解度」は、本人の答えとどれくらい同じだったかを表しています。</small
+    >
   </p>
 {:else if review}
   <h1>この回答で、結果を見る？</h1>
@@ -214,7 +217,9 @@ async function submit() {
         </li>
       {/each}
     </ul>
-    <p>「{name}」の名前と点数が公開されます。</p>
+    <p>
+      「{name}」の名前・正解数・理解度・答えた日時が、誰でも見られる回答者一覧に載ります。
+    </p>
     <Turnstile
       sitekey={data.sitekey}
       action="answer"

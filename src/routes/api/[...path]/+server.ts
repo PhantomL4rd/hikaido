@@ -3,7 +3,6 @@ import {
   contact,
   manage,
   publish,
-  react,
   remove,
   report,
   respondents,
@@ -28,7 +27,6 @@ export const POST: RequestHandler = async (e) => {
     if (!id) return json(await publish(e), { status: 201 });
     if (action === "responses")
       return json(await submit(e, id), { status: 201 });
-    if (action === "reaction") return json(await react(e, id));
   }
   if (resource === "reports") return json(await report(e), { status: 201 });
   if (resource === "contacts") return json(await contact(e), { status: 201 });

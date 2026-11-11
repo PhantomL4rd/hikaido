@@ -72,7 +72,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
   await friend.getByRole("button", { name: "挑戦する" }).click();
   for (let i = 0; i < 10; i++) {
     await friend.locator(".choice").first().click();
-    await expect(friend.getByText("まだ集計中！")).toBeVisible();
+    await expect(friend.locator(".reaction")).toHaveCount(0);
     await friend
       .getByRole("button", { name: i === 9 ? "自分のこたえをみる" : "つぎへ" })
       .click();

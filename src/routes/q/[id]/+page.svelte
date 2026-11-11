@@ -16,7 +16,6 @@ let name = $state(""),
   started = $state(false),
   position = $state(0),
   answers = $state<Record<string, Choice>>({}),
-  reaction = $state(""),
   busy = $state(false),
   message = $state(""),
   review = $state(false),
@@ -26,8 +25,7 @@ let name = $state(""),
   resultToken = $state(""),
   existing = $state(""),
   ready = $state(false),
-  reduced = $state(true),
-  reacting = $state(false);
+  reduced = $state(true);
 const current = $derived(data.quiz.questions[position]);
 const key = $derived(`hikaido-answer-${data.quiz.id}`);
 onMount(() => {
@@ -74,24 +72,8 @@ function start() {
   message = "";
   started = true;
 }
-async function choose(choice: Choice) {
-  if (reacting) return;
+function choose(choice: Choice) {
   answers[current.id] = choice;
-  reaction = "";
-  reacting = true;
-  try {
-    const r = await api<{ reaction: string }>(
-      `quizzes/${data.quiz.id}/reaction`,
-      "POST",
-      { questionId: current.id, choice },
-    );
-    reaction = r.reaction;
-  } catch {
-    reaction =
-      "みんなの予想を読み込めませんでした。あなたの答えは保存されているので、そのまま続けてね。";
-  } finally {
-    reacting = false;
-  }
 }
 async function submit() {
   busy = true;
@@ -208,7 +190,6 @@ async function submit() {
               onclick={() => {
                 position = i;
                 review = false;
-                reaction = "";
               }}
             >
               変更
@@ -252,7 +233,6 @@ async function submit() {
           type="button"
           class="choice"
           aria-pressed={answers[current.id] === "A"}
-          disabled={reacting}
           onclick={() => choose("A")}
         >
           <small>A</small>{current.choiceA}
@@ -260,7 +240,6 @@ async function submit() {
           type="button"
           class="choice"
           aria-pressed={answers[current.id] === "B"}
-          disabled={reacting}
           onclick={() => choose("B")}
         >
           <small>B</small>{current.choiceB}
@@ -268,35 +247,20 @@ async function submit() {
       </div>
     </section>
   {/key}
-  <p class="reaction" aria-live="polite">
-    {#key reaction}
-      {#if reacting}
-        集計中…
-      {:else}
-        <span in:fade={{ duration: reduced ? 0 : 120 }}>{reaction}</span>
-      {/if}
-    {/key}
-  </p>
-  <p class="text-center">
-    <small>みんなの予想の傾向です。多数派が正解とは限りません。</small>
-  </p>
   <div class="actions">
     <button
       type="button"
-      disabled={reacting}
       onclick={() => {
         if (position > 0) position--;
         else started = false;
-        reaction = "";
       }}
     >
       <Icon name="ArrowLeft" size={16} />もどる
     </button><button
       type="button"
       class="primary"
-      disabled={!answers[current.id] || reacting}
+      disabled={!answers[current.id]}
       onclick={() => {
-        reaction = "";
         if (position < data.quiz.questionCount - 1) position++;
         else review = true;
       }}

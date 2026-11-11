@@ -8,7 +8,6 @@ import {
   manage,
   publicQuiz,
   publish,
-  react,
   remove,
   report,
   respondents,
@@ -171,17 +170,10 @@ it("作成者は全問題の正答率を確認でき、回答削除後は再集�
     ),
   ).toBe(true);
 });
-it("多数派が不正解の場合も正解を漏らさずリアクションし、削除後に再集計する", async () => {
+it("回答者の正答率は削除後に再集計する", async () => {
   const q = await create(10, "B");
   const answers = [];
   for (let i = 0; i < 5; i++) answers.push(await answer(q, "A"));
-  const qid = q.quiz.questions[0].id;
-  expect(await react(event({ questionId: qid, choice: "A" }), q.id)).toEqual({
-    reaction: "多数派！",
-  });
-  expect(await react(event({ questionId: qid, choice: "B" }), q.id)).toEqual({
-    reaction: "レア！",
-  });
   const r = await result(
     event(undefined, answers[0].token),
     q.id,
@@ -189,9 +181,6 @@ it("多数派が不正解の場合も正解を漏らさずリアクションし�
   );
   expect(r.questions[0].stats).toMatchObject({ a: 5, b: 0, correctRate: 0 });
   await remove(event(undefined, q.token), q.id, answers[0].id);
-  expect(await react(event({ questionId: qid, choice: "A" }), q.id)).toEqual({
-    reaction: "まだ集計中！",
-  });
   expect(
     (await result(event(undefined, answers[1].token), q.id, answers[1].id))
       .questions[0].stats.a,
@@ -207,7 +196,7 @@ it("多数派が不正解の場合も正解を漏らさずリアクションし�
       .first("n"),
   ).toBe(0);
 });
-it("50対50は割れてる、32件カーソルは同時刻でも重複せず新着順", async () => {
+it("32件カーソルは同時刻でも重複せず新着順", async () => {
   const q = await create();
   for (let i = 0; i < 34; i++) await answer(q, i % 2 ? "A" : "B");
   const first = await respondents(event(), q.id);
@@ -239,12 +228,6 @@ it("50対50は割れてる、32件カーソルは同時刻でも重複せず新�
     expect(first.items[i - 1].createdAt).toBeGreaterThanOrEqual(
       first.items[i].createdAt,
     );
-  expect(
-    await react(
-      event({ questionId: q.quiz.questions[0].id, choice: "A" }),
-      q.id,
-    ),
-  ).toEqual({ reaction: "割れてる！" });
 }, 30000);
 it("不正トークンと他クイズの回答削除を拒み、全体削除で明細も消す", async () => {
   const q = await create(),

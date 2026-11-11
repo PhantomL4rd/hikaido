@@ -2,7 +2,7 @@ import { error } from "@sveltejs/kit";
 import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
-import { diagnose, reaction, statistics } from "#lib/domain";
+import { diagnose, statistics } from "#lib/domain";
 import { origin } from "#lib/paths";
 import { templates } from "#lib/templates";
 import {
@@ -223,34 +223,6 @@ export async function submit(e: ServiceEvent, id: string) {
     throw cause;
   }
   return { id: rid };
-}
-export async function react(e: ServiceEvent, id: string) {
-  await rate(e, "reaction", 300);
-  await publicQuiz(e, id);
-  const data = await read(
-    e,
-    v.object({ questionId: v.string(), choice: v.picklist(["A", "B"]) }),
-  );
-  const db = database(e);
-  const [q] = await db
-    .select({ id: questions.id })
-    .from(questions)
-    .where(and(eq(questions.id, data.questionId), eq(questions.quizId, id)));
-  if (!q) error(404, "問題が見つかりません");
-  const rows = await db
-    .select({
-      choice: responseAnswers.selectedChoice,
-      count: sql<number>`count(*)`,
-    })
-    .from(responseAnswers)
-    .where(eq(responseAnswers.questionId, q.id))
-    .groupBy(responseAnswers.selectedChoice);
-  return {
-    reaction: reaction(
-      Number(rows.find((r) => r.choice === data.choice)?.count || 0),
-      rows.reduce((n, r) => n + Number(r.count), 0),
-    ),
-  };
 }
 export async function result(e: ServiceEvent, id: string, rid: string) {
   const db = database(e);

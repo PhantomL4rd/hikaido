@@ -119,58 +119,6 @@ it("公開スナップショットは正解とタイプを漏らさず、全問�
     ).rejects.toMatchObject({ status: 409 });
   }
 });
-it("作成者は全問題の正答率を確認でき、回答削除後は再集計される", async () => {
-  const q = await create();
-  const empty = await manage(event(undefined, q.token), q.id);
-  expect(empty.questionStats).toHaveLength(10);
-  expect(empty.questionStats[0]).toEqual({
-    id: q.quiz.questions[0].id,
-    question: q.quiz.questions[0].question,
-    total: 0,
-    correctCount: 0,
-    correctRate: null,
-  });
-  const a = await answer(q, "A");
-  await answer(q, "B");
-  const mixed = await manage(event(undefined, q.token), q.id);
-  expect(
-    mixed.questionStats.every(
-      (s) => s.total === 2 && s.correctCount === 1 && s.correctRate === 50,
-    ),
-  ).toBe(true);
-  await submit(
-    event({
-      respondentName: "問題ごとに違う回答",
-      idempotencyKey: crypto.randomUUID(),
-      resultToken: "s".repeat(64),
-      answers: q.quiz.questions.map((question, i) => ({
-        questionId: question.id,
-        choice: i === 0 ? "B" : "A",
-      })),
-    }),
-    q.id,
-  );
-  const varied = await manage(event(undefined, q.token), q.id);
-  expect(varied.questionStats.map((s) => s.id)).toEqual(
-    q.quiz.questions.map((question) => question.id),
-  );
-  expect(varied.questionStats.map((s) => s.correctRate)).toEqual([
-    33,
-    ...Array(9).fill(67),
-  ]);
-  await expect(manage(event(), q.id)).rejects.toMatchObject({ status: 403 });
-  expect(await respondents(event(), q.id)).not.toHaveProperty("questionStats");
-  await remove(event(undefined, q.token), q.id, a.id);
-  const remaining = await manage(event(undefined, q.token), q.id);
-  expect(
-    remaining.questionStats.every(
-      (s, i) =>
-        s.total === 2 &&
-        s.correctCount === (i === 0 ? 0 : 1) &&
-        s.correctRate === (i === 0 ? 0 : 50),
-    ),
-  ).toBe(true);
-});
 it("多数派が不正解の場合も正解を漏らさずリアクションし、削除後に再集計する", async () => {
   const q = await create(10, "B");
   const answers = [];
@@ -212,17 +160,6 @@ it("50対50は割れてる、32件カーソルは同時刻でも重複せず新�
   for (let i = 0; i < 34; i++) await answer(q, i % 2 ? "A" : "B");
   const first = await respondents(event(), q.id);
   expect(first.items).toHaveLength(32);
-  const stats = await manage(
-    event(
-      undefined,
-      q.token,
-      `?cursor=${encodeURIComponent(first.nextCursor ?? "")}`,
-    ),
-    q.id,
-  );
-  expect(
-    stats.questionStats.every((s) => s.total === 34 && s.correctRate === 50),
-  ).toBe(true);
   const second = await respondents(
     event(
       undefined,

@@ -124,28 +124,6 @@ async function remove() {
       </button>
     {/if}
   </section>
-  <section class="card">
-    <h2>問題ごとの正答率</h2>
-    <p class="muted">
-      これまでのフレンド全員のこたえを集計しています。削除した回答は含みません。
-    </p>
-    <!-- biome-ignore lint/a11y/noRedundantRoles: list-styleなしでもSafariにリストとして伝えるため -->
-    <ol class="list" role="list">
-      {#each data.questionStats as q, i (q.id)}
-        <li>
-          <h3>第{i + 1}問：{q.question}</h3>
-          {#if q.correctRate === null}
-            <p class="muted">まだ回答がありません。</p>
-          {:else}
-            <p>
-              <strong>正答率 {q.correctRate}%</strong>
-              · {q.total}人中{q.correctCount}人が正解
-            </p>
-          {/if}
-        </li>
-      {/each}
-    </ol>
-  </section>
   <button type="button" class="danger full" onclick={() => confirm()}>
     クイズ全体を削除
   </button>

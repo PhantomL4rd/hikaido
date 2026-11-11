@@ -314,31 +314,11 @@ export async function result(e: ServiceEvent, id: string, rid: string) {
 export async function manage(e: ServiceEvent, id: string) {
   const q = await owner(e, id);
   const page = await respondents(e, id);
-  const questionStats = await database(e)
-    .select({
-      id: questions.id,
-      question: questions.question,
-      total: sql<number>`count(${responseAnswers.responseId})`,
-      correctCount: sql<number>`coalesce(sum(${responseAnswers.isCorrect}), 0)`,
-    })
-    .from(questions)
-    .leftJoin(responseAnswers, eq(responseAnswers.questionId, questions.id))
-    .where(eq(questions.quizId, id))
-    .groupBy(questions.id)
-    .orderBy(questions.position);
   return {
     id: q.id,
     characterName: q.characterName,
     questionCount: q.questionCount,
     ...page,
-    questionStats: questionStats.map((s) => ({
-      ...s,
-      total: Number(s.total),
-      correctCount: Number(s.correctCount),
-      correctRate: s.total
-        ? Math.round((Number(s.correctCount) / Number(s.total)) * 100)
-        : null,
-    })),
   };
 }
 export async function remove(e: ServiceEvent, id: string, rid?: string) {

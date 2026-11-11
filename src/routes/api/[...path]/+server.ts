@@ -1,6 +1,7 @@
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import {
   contact,
+  creatorReaction,
   manage,
   publish,
   remove,
@@ -21,6 +22,8 @@ export const GET: RequestHandler = async (e) => {
 };
 export const POST: RequestHandler = async (e) => {
   const [resource, id, action, rid, operation] = e.params.path!.split("/");
+  if (resource === "creator-reaction" && !id)
+    return json(await creatorReaction(e));
   if (resource === "quizzes") {
     if (id && action === "result" && rid && operation === "share")
       return json(await shareResult(e, id, rid), { status: 201 });

@@ -3,6 +3,7 @@ import { onMount, tick } from "svelte";
 import { fade } from "svelte/transition";
 import * as v from "valibot";
 import { api, copy, load, type Owned, save, secret } from "#lib/client";
+import CreatorReaction from "#lib/components/CreatorReaction.svelte";
 import Icon from "#lib/components/Icon.svelte";
 import Turnstile from "#lib/components/Turnstile.svelte";
 import {
@@ -190,6 +191,7 @@ function url() {
       </div>
     </section>
   {/key}
+  <CreatorReaction templateId={current.id} choice={current.answer} />
   {#if current.type === "normal"}
     <p class="text-center">
       <button

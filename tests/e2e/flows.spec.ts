@@ -32,6 +32,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
   await page.getByLabel("キャラクター名").fill("ひろし");
   await page.getByRole("button", { name: "2択をはじめる" }).click();
   await page.getByRole("button", { name: /A 高難度レイド/ }).click();
+  await expect(page.locator(".reaction")).toContainText("まだ集計中！");
   await page.reload();
   await expect(
     page.getByRole("button", { name: /A 高難度レイド/ }),
@@ -81,6 +82,8 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     .getByRole("button", { name: "回答を確定して結果を見る" })
     .click();
   await expect(friend.locator(".score")).toContainText("100");
+  await expect(friend.locator(".result-question")).toHaveCount(0);
+  await expect(friend.getByText("正解：", { exact: false })).toHaveCount(0);
   await expect(
     friend.getByText(
       new RegExp(`^(${types.map((type) => type.name).join("|")})$`),
@@ -174,7 +177,9 @@ test("25問・正解秘匿・冪等性・権限・統計削除・不正入力", 
   );
   expect(result.ok()).toBe(true);
   const detail = await result.json();
-  expect(detail.questions).toHaveLength(25);
+  expect(detail).not.toHaveProperty("questions");
+  expect(JSON.stringify(detail)).not.toContain("correctChoice");
+  expect(JSON.stringify(detail)).not.toContain("selectedChoice");
   const body = {
     respondentName: "再送テスト",
     idempotencyKey: saved.idempotencyKey,

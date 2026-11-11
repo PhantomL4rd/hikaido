@@ -2,7 +2,7 @@ import { error } from "@sveltejs/kit";
 import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
-import { diagnose, statistics } from "#lib/domain";
+import { diagnose, reaction } from "#lib/domain";
 import { origin } from "#lib/paths";
 import { templates } from "#lib/templates";
 import {
@@ -224,6 +224,33 @@ export async function submit(e: ServiceEvent, id: string) {
   }
   return { id: rid };
 }
+export async function creatorReaction(e: ServiceEvent) {
+  await rate(e, "creator-reaction", 300);
+  const data = await read(
+    e,
+    v.object({ templateId: v.string(), choice: v.picklist(["A", "B"]) }),
+  );
+  const template = templates.find((t) => t.id === data.templateId);
+  if (!template) error(404, "問題が見つかりません");
+  const rows = await database(e)
+    .select({ choice: questions.correctChoice, count: sql<number>`count(*)` })
+    .from(questions)
+    .innerJoin(quizzes, eq(quizzes.id, questions.quizId))
+    .where(
+      and(
+        eq(questions.templateId, template.id),
+        eq(questions.version, template.version),
+        eq(quizzes.status, "published"),
+      ),
+    )
+    .groupBy(questions.correctChoice);
+  return {
+    reaction: reaction(
+      Number(rows.find((r) => r.choice === data.choice)?.count || 0),
+      rows.reduce((n, r) => n + Number(r.count), 0),
+    ),
+  };
+}
 export async function result(e: ServiceEvent, id: string, rid: string) {
   const db = database(e);
   const quiz = await publicQuiz(e, id);
@@ -237,25 +264,6 @@ export async function result(e: ServiceEvent, id: string, rid: string) {
     .select({ type: quizzes.hikansenType })
     .from(quizzes)
     .where(eq(quizzes.id, id));
-  const answers = await db
-    .select()
-    .from(responseAnswers)
-    .where(eq(responseAnswers.responseId, rid));
-  const qs = await db
-    .select()
-    .from(questions)
-    .where(eq(questions.quizId, id))
-    .orderBy(questions.position);
-  const grouped = await db
-    .select({
-      questionId: responseAnswers.questionId,
-      choice: responseAnswers.selectedChoice,
-      count: sql<number>`count(*)`,
-    })
-    .from(responseAnswers)
-    .innerJoin(responses, eq(responses.id, responseAnswers.responseId))
-    .where(eq(responses.quizId, id))
-    .groupBy(responseAnswers.questionId, responseAnswers.selectedChoice);
   return {
     quiz,
     response: {
@@ -264,23 +272,6 @@ export async function result(e: ServiceEvent, id: string, rid: string) {
       correctCount: r.correctCount,
     },
     type: q.type,
-    questions: qs.map((q) => ({
-      ...quiz.questions.find((x) => x.id === q.id)!,
-      correctChoice: q.correctChoice,
-      selectedChoice: answers.find((a) => a.questionId === q.id)!
-        .selectedChoice,
-      stats: statistics(
-        Number(
-          grouped.find((g) => g.questionId === q.id && g.choice === "A")
-            ?.count || 0,
-        ),
-        Number(
-          grouped.find((g) => g.questionId === q.id && g.choice === "B")
-            ?.count || 0,
-        ),
-        q.correctChoice,
-      ),
-    })),
   };
 }
 export async function manage(e: ServiceEvent, id: string) {

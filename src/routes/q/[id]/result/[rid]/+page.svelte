@@ -112,46 +112,6 @@ const type = $derived(types.find((t) => t.id === data?.type));
       >
     </section>
   {/if}
-  <section class="card">
-    <h2>答え合わせと、みんなの予想</h2>
-    {#each data.questions as q, i}
-      <article class="result-question">
-        <span class="pill"
-          >{q.selectedChoice === q.correctChoice ? "一致！" : "おしい！"}
-          · 正答率 {q.stats.correctRate}%</span
-        >
-        <h3>{i + 1}. {q.question}</h3>
-        <p>
-          正解：<strong
-            >{q.correctChoice === "A" ? q.choiceA : q.choiceB}</strong
-          ><br>あなたの回答：{q.selectedChoice === "A" ? q.choiceA : q.choiceB}
-        </p>
-        <div class="row between">
-          <span>A · {q.choiceA}</span
-          ><small>{q.stats.a}人 · {q.stats.percentA}%</small>
-        </div>
-        <div class="bar" role="img" aria-label={`A ${q.stats.percentA}%`}>
-          <span style={`width:${q.stats.percentA}%`}></span>
-        </div>
-        <div class="row between">
-          <span>B · {q.choiceB}</span
-          ><small>{q.stats.b}人 · {q.stats.percentB}%</small>
-        </div>
-        <div class="bar b" role="img" aria-label={`B ${q.stats.percentB}%`}>
-          <span style={`width:${q.stats.percentB}%`}></span>
-        </div>
-        <small
-          >あなたの選択：{q.stats.a === q.stats.b
-            ? "同数"
-            : (q.selectedChoice === "A" ? q.stats.a : q.stats.b) >
-                q.stats.total / 2
-              ? "多数派"
-              : "少数派"}
-          · 集計した回答 {q.stats.total}人</small
-        >
-      </article>
-    {/each}
-  </section>
   <div class="actions">
     <a class="button" href={`${base}/q/${data.quiz.id}/responses`}
       >回答者一覧を見る</a

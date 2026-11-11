@@ -5,6 +5,7 @@ import { retryNotifications } from "../src/lib/server/notifications";
 import type { ServiceEvent } from "../src/lib/server/security";
 import {
   contact,
+  creatorReaction,
   manage,
   publicQuiz,
   publish,
@@ -109,7 +110,17 @@ it("公開スナップショットは正解とタイプを漏らさず、全問�
     const r = await result(event(undefined, a.token), q.id, a.id);
     expect(r.response.correctCount).toBe(n);
     expect(r.type).toBe("battle");
-    expect(r.questions.every((q) => q.stats.correctRate === 100)).toBe(true);
+    expect(r).not.toHaveProperty("questions");
+    for (const field of [
+      "correctChoice",
+      "selectedChoice",
+      "isCorrect",
+      "stats",
+      "correctRate",
+      "percentA",
+      "percentB",
+    ])
+      expect(JSON.stringify(r)).not.toContain(`"${field}"`);
     const b = await submit(event(a.body), q.id);
     expect(b.id).toBe(a.id);
     expect((await respondents(event(), q.id)).items).toHaveLength(1);
@@ -179,11 +190,13 @@ it("回答者の正答率は削除後に再集計する", async () => {
     q.id,
     answers[0].id,
   );
-  expect(r.questions[0].stats).toMatchObject({ a: 5, b: 0, correctRate: 0 });
+  expect(r.response.correctCount).toBe(0);
+  expect(
+    (await manage(event(undefined, q.token), q.id)).questionStats[0],
+  ).toMatchObject({ total: 5, correctRate: 0 });
   await remove(event(undefined, q.token), q.id, answers[0].id);
   expect(
-    (await result(event(undefined, answers[1].token), q.id, answers[1].id))
-      .questions[0].stats.a,
+    (await manage(event(undefined, q.token), q.id)).questionStats[0].total,
   ).toBe(4);
   await expect(
     result(event(undefined, answers[0].token), q.id, answers[0].id),
@@ -507,4 +520,26 @@ it("文面移行は公開済みクイズの助詞だけを直し、再実行し�
       question_snapshot: "ひろしが新エリアでまずしたいのは？",
     });
   }
+});
+
+it("出題者の回答傾向は同じ問題の公開クイズだけを集計する", async () => {
+  const templateId = templates.find((t) => t.type === "diagnosis")!.id;
+  const lookup = (choice: "A" | "B", id = templateId) =>
+    creatorReaction(event({ templateId: id, choice }));
+  await config.DB.prepare("UPDATE questions SET version=0 WHERE template_id=?")
+    .bind(templateId)
+    .run();
+  expect(await lookup("A")).toEqual({ reaction: "まだ集計中！" });
+  const seeds = [];
+  for (let i = 0; i < 5; i++) seeds.push(await create(10, "A"));
+  expect(await lookup("A")).toEqual({ reaction: "多数派！" });
+  expect(await lookup("B")).toEqual({ reaction: "レア！" });
+  for (let i = 0; i < 5; i++) await answer(seeds[0], "B");
+  expect(await lookup("A")).toEqual({ reaction: "多数派！" });
+  await config.DB.prepare("UPDATE quizzes SET status='hidden' WHERE id=?")
+    .bind(seeds[1].id)
+    .run();
+  await remove(event(undefined, seeds[2].token), seeds[2].id);
+  expect(await lookup("A")).toEqual({ reaction: "まだ集計中！" });
+  await expect(lookup("A", "unknown")).rejects.toMatchObject({ status: 404 });
 });

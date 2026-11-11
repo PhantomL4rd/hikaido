@@ -20,7 +20,8 @@ onMount(() => {
   <section class="card">
     <h2>{q.name}の理解度チェック</h2>
     <div class="actions">
-      <a class="button primary" href={`${base}/manage/${q.id}`}>こたえをみる</a
+      <a class="button primary" href={`${base}/manage/${q.id}`}
+        >フレンドのこたえをみる</a
       ><a class="button" href={`${base}/q/${q.id}`}>クイズを見る</a>
     </div>
   </section>

@@ -223,7 +223,7 @@ function url() {
         else stage = "review";
       }}
     >
-      {position === draft.length - 1 ? "こたえをみる" : "つぎへ"}
+      {position === draft.length - 1 ? "自分のこたえをみる" : "つぎへ"}
     </button>
   </div>
 {:else if stage === "review"}
@@ -309,7 +309,9 @@ function url() {
       </button>
       <div class="actions">
         <a class="button" href={`${base}/q/${published}`}>クイズを見る</a
-        ><a class="button" href={`${base}/manage/${published}`}>こたえをみる</a>
+        ><a class="button" href={`${base}/manage/${published}`}
+          >フレンドのこたえをみる</a
+        >
       </div>
     </div>
   </section>

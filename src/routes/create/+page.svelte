@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
+import { onMount, tick } from "svelte";
 import { fade } from "svelte/transition";
 import * as v from "valibot";
 import { api, copy, load, type Owned, save, secret } from "#lib/client";
@@ -17,6 +17,7 @@ import { base } from "#lib/paths";
 import { nameSchema } from "#lib/validation";
 
 let { data } = $props();
+let questionHeading = $state<HTMLHeadingElement>();
 let name = $state(""),
   count = $state<10 | 25>(10),
   draft = $state<DraftQuestion[]>([]),
@@ -74,6 +75,17 @@ function start() {
 }
 function select(choice: Choice) {
   draft[position].answer = choice;
+}
+async function restartAnswers() {
+  if (busy) return;
+  draft = draft.map((question) => ({ ...question, answer: undefined }));
+  position = 0;
+  message = "";
+  token = "";
+  reset++;
+  stage = "questions";
+  await tick();
+  questionHeading?.focus();
 }
 async function publish() {
   busy = true;
@@ -156,7 +168,9 @@ function url() {
   ></progress>
   {#key current.id}
     <section in:fade={{ duration: reduced ? 0 : 130 }}>
-      <h1 class="question">{current.question.replaceAll("{name}", name)}</h1>
+      <h1 class="question" tabindex="-1" bind:this={questionHeading}>
+        {current.question.replaceAll("{name}", name)}
+      </h1>
       <div class="grid">
         <button
           type="button"
@@ -245,6 +259,11 @@ function url() {
         </li>
       {/each}
     </ul>
+    <p>
+      <button type="button" disabled={busy} onclick={restartAnswers}>
+        全部回答し直す
+      </button>
+    </p>
     <p>
       公開する前に、問題と正解を確認してください。公開後の変更はできません。クイズはURLを知っている方なら、どなたでも楽しめます。
     </p>

@@ -18,7 +18,7 @@ describe("診断", () => {
       "t003",
       "t004",
       "t029",
-      "t032",
+      "t034",
       "t005",
     ].map((id) => ({
       ...templates.find((q) => q.id === id)!,
@@ -46,28 +46,152 @@ describe("診断", () => {
             (score) => Number.isInteger(score) && score >= 0,
           ),
         ).toBe(true);
-        expect(q.typeScores?.[choice].some((score) => score > 0)).toBe(true);
       }
     }
   });
 
-  it("16通りで各タイプへ2回到達し再現可能", () => {
-    const counts = new Map();
-    for (let i = 0; i < 16; i++) {
-      const a = Array.from({ length: 4 }, (_, j) =>
-        (i >> j) & 1 ? "B" : "A",
-      ) as ("A" | "B")[];
-      const questions = templates
-        .slice(0, 4)
-        .map((q, j) => ({ ...q, answer: a[j] }));
-      const t = diagnose(questions);
-      expect(diagnose(questions)).toBe(t);
-      counts.set(t, (counts.get(t) || 0) + 1);
+  it("固定問は回答が直接示す関心だけに加点する", () => {
+    expect(templates.find((q) => q.id === "t001")?.typeScores?.B).toEqual(
+      Array(8).fill(0),
+    );
+    expect(templates.find((q) => q.id === "t004")?.typeScores?.B).toEqual(
+      Array(8).fill(0),
+    );
+    for (const answer of ["A", "B"] as const) {
+      expect(
+        templates.find((q) => q.id === "t002")?.typeScores?.[answer],
+      ).toEqual([0, 2, 0, 0, 0, 0, 0, 0]);
     }
-    expect(counts.size).toBe(8);
-    expect([...counts.values()]).toEqual(Array(8).fill(2));
-    expect(types).toHaveLength(8);
+    expect(templates.find((q) => q.id === "t003")?.typeScores?.A).toEqual([
+      0, 0, 2, 0, 0, 0, 0, 0,
+    ]);
   });
+
+  it("種族や音楽、ジョブ、日常の好みは診断を変えない", () => {
+    const base = ["t001", "t002", "t003", "t004"].map((id) => ({
+      id,
+      answer: "A" as const,
+    }));
+    const neutral = [
+      "t006",
+      "t007",
+      "t014",
+      "t015",
+      "t021",
+      "t026",
+      "t034",
+      "t037",
+      "t040",
+      "t049",
+      "t077",
+      "t079",
+      "t085",
+      "t086",
+      "t087",
+      "t090",
+      "t092",
+      "t093",
+    ];
+    for (const answer of ["A", "B"] as const) {
+      for (const id of neutral) {
+        expect(
+          templates.find((q) => q.id === id)?.typeScores?.[answer],
+        ).toEqual(Array(8).fill(0));
+      }
+      expect(
+        diagnose([...base, ...neutral.map((id) => ({ id, answer }))]),
+      ).toBe(diagnose(base));
+    }
+  });
+
+  it("らーどよんの25回答は物語の旅人になりバトルへの加点はない", () => {
+    const choices = [
+      "気軽にルーレット",
+      "メインストーリー",
+      "ミラプリ",
+      "マーケットで購入",
+      "バトルBGM",
+      "内装づくり",
+      "まとめて保管",
+      "その場で飛び跳ねる",
+      "晴れた青空",
+      "ジョブごとに変える",
+      "植物",
+      "アウラ",
+      "テキストチャット派",
+      "タンヒラ",
+      "いろいろ使う",
+      "まずジャンプ",
+      "かっこいい系",
+      "ギャザクラでコツコツ",
+      "探検手帳",
+      "笑顔でかわいく",
+      "装備コンプリート",
+      "固定パーティ",
+      "ノーマルレイド",
+      "ララフェル",
+      "いつもの定位置",
+    ];
+    const answers = choices.map((choice) => {
+      const matches = templates.filter(
+        (q) => q.choiceA === choice || q.choiceB === choice,
+      );
+      expect(matches).toHaveLength(1);
+      const q = matches[0];
+      const answer = q.choiceA === choice ? ("A" as const) : ("B" as const);
+      expect(q.typeScores?.[answer][0]).toBe(0);
+      return { id: q.id, answer };
+    });
+    expect(diagnose(answers)).toBe("story");
+  });
+
+  it("追加11問は好みに対応するタイプだけに1点を加算する", () => {
+    const expected = [
+      ["battle", "fashion"],
+      ["battle", "housing"],
+      ["battle", "craft"],
+      ["battle", "explorer"],
+      ["housing", "craft"],
+      ["housing", "story"],
+      ["housing", "explorer"],
+      ["craft", "story"],
+      ["craft", "explorer"],
+      ["story", "explorer"],
+      ["story", "fashion"],
+    ];
+    const totals = types.map(() => 0);
+    expected.forEach((pair, i) => {
+      const question = templates.find(
+        (q) => q.id === `t${String(99 + i).padStart(3, "0")}`,
+      );
+      expect(question?.type).toBe("normal");
+      for (const [j, answer] of (["A", "B"] as const).entries()) {
+        const scores = types.map((type) => Number(type.id === pair[j]));
+        expect(question?.typeScores?.[answer]).toEqual(scores);
+        scores.forEach((score, index) => {
+          totals[index] += score;
+        });
+      }
+    });
+    expect(totals).toEqual([4, 4, 2, 4, 4, 0, 4, 0]);
+    expect(templates.find((q) => q.id === "t099")?.choiceB).toBe(
+      "新しいおしゃれ装備",
+    );
+  });
+
+  it.each(types.map((type, i) => [type.id, i] as const))(
+    "%sは関心に沿った回答で到達できる",
+    (id, index) => {
+      const answers = templates.flatMap((q) => {
+        if (!q.typeScores) throw new Error(`配点が未定義です: ${q.id}`);
+        const a = q.typeScores.A[index];
+        const b = q.typeScores.B[index];
+        if (q.type === "normal" && Math.max(a, b) === 0) return [];
+        return [{ id: q.id, answer: a > b ? ("A" as const) : ("B" as const) }];
+      });
+      expect(diagnose(answers)).toBe(id);
+    },
+  );
 });
 describe("問題", () => {
   it("すべてのテンプレートを一意のIDで識別できる", () => {

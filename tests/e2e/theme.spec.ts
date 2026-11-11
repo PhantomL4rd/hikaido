@@ -9,7 +9,7 @@ test("最上部の案内帯を表示しない", async ({ page }) => {
   ).toHaveCount(0);
 });
 
-test("OSの配色変更に追従し、手動選択を保存してOS設定にも戻せる", async ({
+test("OSの配色変更に追従し、ヘッダーの切り替えを保存して配色設定は表示しない", async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "dark" });
@@ -27,10 +27,8 @@ test("OSの配色変更に追従し、手動選択を保存してOS設定にも�
   await page.reload();
   await expect(html).toHaveClass(/dark/);
   await page.getByRole("button", { name: "メニューを開く" }).click();
-  await page.getByLabel("配色設定", { exact: true }).selectOption("system");
-  await expect(html).not.toHaveClass(/dark/);
-  await page.emulateMedia({ colorScheme: "dark" });
-  await expect(html).toHaveClass(/dark/);
+  await expect(page.getByLabel("配色設定", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("combobox")).toHaveCount(0);
 });
 
 test("保存済みのライト設定をOSのダーク設定より優先する", async ({ page }) => {

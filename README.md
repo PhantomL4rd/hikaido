@@ -13,7 +13,7 @@ SvelteKit 3の設定は `vite.config.ts`、Bindingsは現行の `cloudflare:work
 ## ディレクトリ
 
 ```text
-src/lib/templates.ts          運営テンプレート（通常76問＋診断4問）
+src/lib/templates.ts          運営テンプレート（好みの比較・無得点の質問・固定診断4問）
 src/lib/domain.ts             診断・下書き・統計・リアクション
 src/lib/validation.ts         共通Valibotスキーマ
 src/lib/components/          ロゴ差し替え箇所、共有、Turnstile
@@ -94,7 +94,7 @@ pnpm test:e2e              # 一時D1を毎回用意。 .dev.varsは上記ロー
 pnpm build
 ```
 
-単体テストは固定4問の診断全16パターン・8タイプ到達、通常問題を含む診断集計、10/25問、重複防止、差し替え・回答リセット、統計・リアクション境界、入力検証、ハッシュ・Slackエスケープを検証します。D1統合では採点・冪等性・32件カーソル・削除権限・CASCADE・正解秘匿・多数派と正解の分離・削除後統計・通報スナップショット・Outbox失敗と再送を確認します。Playwrightは作成・復元・回答・結果・削除とAPI制御を確認します。本物のSlack・Turnstileの疎通は本番Secret設定後に別途実施してください。
+単体テストは固定4問の意味に沿った配点・8タイプ到達・追加11問の配点と配分、通常問題を含む診断集計、10/25問、重複防止、差し替え・回答リセット、統計・リアクション境界、入力検証、ハッシュ・Slackエスケープを検証します。D1統合では採点・冪等性・32件カーソル・削除権限・CASCADE・正解秘匿・多数派と正解の分離・削除後統計・通報スナップショット・Outbox失敗と再送を確認します。Playwrightは作成・復元・回答・結果・削除とAPI制御を確認します。本物のSlack・Turnstileの疎通は本番Secret設定後に別途実施してください。
 
 ## 運営CLI
 

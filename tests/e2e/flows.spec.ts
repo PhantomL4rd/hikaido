@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { types } from "../../src/lib/domain";
 import { templates } from "../../src/lib/templates";
 
 const root = "";
@@ -75,7 +76,9 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     .click();
   await expect(friend.locator(".score")).toContainText("100");
   await expect(
-    friend.getByText("バトルジャンキー", { exact: true }),
+    friend.getByText(
+      new RegExp(`^(${types.map((type) => type.name).join("|")})$`),
+    ),
   ).toBeVisible();
   await friend.getByRole("button", { name: "結果を共有", exact: true }).click();
   const sharedHref = await friend

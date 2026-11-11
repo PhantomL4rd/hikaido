@@ -1,12 +1,6 @@
 <script lang="ts">
 import "../app.css";
-import {
-  ModeWatcher,
-  mode,
-  setMode,
-  toggleMode,
-  userPrefersMode,
-} from "mode-watcher";
+import { ModeWatcher, mode, toggleMode } from "mode-watcher";
 import { onMount } from "svelte";
 import Brand from "#lib/components/Brand.svelte";
 import Icon from "#lib/components/Icon.svelte";
@@ -102,20 +96,6 @@ onMount(() => {
       ><Icon name="Mail" />お問い合わせ</a
     >
     <hr>
-    <label for="color-mode">配色設定</label>
-    <select
-      id="color-mode"
-      value={userPrefersMode.current}
-      onchange={(event) => {
-        const value = event.currentTarget.value;
-        if (value === "system" || value === "light" || value === "dark")
-          setMode(value);
-      }}
-    >
-      <option value="system">OS設定に合わせる</option>
-      <option value="light">ライト</option>
-      <option value="dark">ダーク</option>
-    </select>
     <small>リンク</small
     ><a href="https://pl4rd.com/" target="_blank" rel="noreferrer"
       ><Icon name="House" />ホーム<Icon name="ExternalLink" size={14} /></a

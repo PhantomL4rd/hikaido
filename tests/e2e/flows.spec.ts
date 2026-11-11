@@ -46,7 +46,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     }
     await page.locator(".choice").first().click();
     await page
-      .getByRole("button", { name: i === 9 ? "内容を確認する" : "つぎへ" })
+      .getByRole("button", { name: i === 9 ? "こたえをみる" : "つぎへ" })
       .click();
   }
   await expect(page.getByText("公開前の確認")).toBeVisible();
@@ -74,7 +74,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     await friend.locator(".choice").first().click();
     await expect(friend.getByText("まだ集計中！")).toBeVisible();
     await friend
-      .getByRole("button", { name: i === 9 ? "回答を確認" : "つぎへ" })
+      .getByRole("button", { name: i === 9 ? "こたえをみる" : "つぎへ" })
       .click();
   }
   await friend
@@ -102,7 +102,7 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
   expect(sharedImage.status()).toBe(200);
   expect((await sharedImage.body()).readUInt32BE(16)).toBe(1200);
   const resultUrl = friend.url();
-  await page.getByRole("link", { name: "回答を確認", exact: true }).click();
+  await page.getByRole("link", { name: "こたえをみる", exact: true }).click();
   await expect(page.getByText("友達", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "回答者を削除" }).click();
   await page.getByRole("button", { name: "削除する", exact: true }).click();
@@ -144,7 +144,7 @@ test("25問・正解秘匿・冪等性・権限・統計削除・不正入力", 
   for (let i = 0; i < 25; i++) {
     await page.locator(".choice").first().click();
     await page
-      .getByRole("button", { name: i === 24 ? "回答を確認" : "つぎへ" })
+      .getByRole("button", { name: i === 24 ? "こたえをみる" : "つぎへ" })
       .click();
   }
   await page.getByRole("button", { name: "回答を確定して結果を見る" }).click();

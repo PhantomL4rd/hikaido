@@ -223,7 +223,7 @@ function url() {
         else stage = "review";
       }}
     >
-      {position === draft.length - 1 ? "内容を確認する" : "つぎへ"}
+      {position === draft.length - 1 ? "こたえをみる" : "つぎへ"}
     </button>
   </div>
 {:else if stage === "review"}
@@ -290,7 +290,7 @@ function url() {
   <section class="hero">
     <span class="type-icon"><Icon name="Heart" size={48} /></span>
     <h1>クイズができました！</h1>
-    <p>いつもの仲間に、あなたの2択を。</p>
+    <p>フレンドにあそんでもらおう！</p>
     <div class="card">
       <p class="share-url">{typeof location !== "undefined" ? url() : ""}</p>
       <button
@@ -309,7 +309,7 @@ function url() {
       </button>
       <div class="actions">
         <a class="button" href={`${base}/q/${published}`}>クイズを見る</a
-        ><a class="button" href={`${base}/manage/${published}`}>回答を確認</a>
+        ><a class="button" href={`${base}/manage/${published}`}>こたえをみる</a>
       </div>
     </div>
   </section>

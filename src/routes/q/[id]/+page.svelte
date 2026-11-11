@@ -301,7 +301,7 @@ async function submit() {
         else review = true;
       }}
     >
-      {position === data.quiz.questionCount - 1 ? "回答を確認" : "つぎへ"}
+      {position === data.quiz.questionCount - 1 ? "こたえをみる" : "つぎへ"}
     </button>
   </div>
 {/if}

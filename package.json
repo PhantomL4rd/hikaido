@@ -1,0 +1,53 @@
+{
+  "name": "hikaido",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --host 127.0.0.1",
+    "build": "vite build",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "admin": "tsx scripts/admin.ts",
+    "types": "wrangler types --env-interface CloudflareBindings --strict-vars false --include-runtime false --include-main-module false",
+    "brand:generate": "tsx scripts/brand/generate.ts",
+    "dev:worker": "wrangler dev --port 8788"
+  },
+  "dependencies": {
+    "@lucide/svelte": "^1.70.0",
+    "@resvg/resvg-wasm": "^2.6.2",
+    "@sveltejs/adapter-cloudflare": "latest",
+    "@sveltejs/kit": "latest",
+    "drizzle-orm": "latest",
+    "satori": "0.12.2",
+    "svelte": "latest",
+    "valibot": "latest",
+    "yoga-wasm-web": "0.3.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "latest",
+    "@cloudflare/workers-types": "latest",
+    "@playwright/test": "latest",
+    "@resvg/resvg-js": "^2.6.2",
+    "@sveltejs/vite-plugin-svelte": "latest",
+    "@types/node": "latest",
+    "@types/react": "^19.3.0",
+    "drizzle-kit": "latest",
+    "subset-font": "^2.9.0",
+    "svelte-check": "latest",
+    "tsx": "latest",
+    "typescript": "^6.0.3",
+    "vite": "latest",
+    "vitest": "latest",
+    "wrangler": "latest"
+  },
+  "imports": {
+    "#lib/*.svelte": "./src/lib/*.svelte",
+    "#lib/*": "./src/lib/*.ts"
+  }
+}

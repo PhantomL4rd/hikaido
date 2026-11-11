@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hikaido",
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "compatibility_date": "2026-11-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "binding": "ASSETS", "directory": ".svelte-kit/cloudflare" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hikaido",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "vars": {
+    "PUBLIC_TURNSTILE_SITE_KEY": "",
+    "TURNSTILE_HOSTNAME": "pl4rd.com",
+    "LOCAL_TEST_MODE": "false"
+  },
+  "observability": { "enabled": true, "traces": { "enabled": true } }
+}

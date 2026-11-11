@@ -1,0 +1,13 @@
+/* ひかいど ブランドトークン（Catppuccin ベース） */
+:root {
+  --hk-pink: #f5c2e7; /* Mocha Pink：メイン */
+  --hk-lavender: #b4befe; /* Mocha Lavender：サブ */
+  --hk-rose: #f38ba8; /* Mocha Red：アクセント */
+  --hk-ink: #4c4f69; /* Latte Text：文字 */
+  --hk-ink-soft: #5c5f77; /* Latte Subtext1：補助文字 */
+  --hk-cream: #fdf6f1; /* 背景（Rosewater を薄めた独自色） */
+  --hk-pink-tint: #fbe3f3; /* チップ背景（Pink を薄めた独自色） */
+  --hk-lavender-tint: #e9ebff; /* チップ背景（Lavender を薄めた独自色） */
+  --hk-radius-pill: 999px;
+  --hk-font: "Zen Maru Gothic", sans-serif;
+}

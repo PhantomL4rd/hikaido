@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794372896287,
+      "tag": "0000_hesitant_rhodey",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794374770002,
+      "tag": "0001_response_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794374770391,
+      "tag": "0002_exotic_squirrel_girl",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 84 84"><title>ひかいどのシンボル</title>
+  <path
+    d="M50 82.5 L18.89 51.39 A20 20 0 0 1 47.17 23.1 L78.28 54.22 Z"
+    fill="#f5c2e7"
+    stroke="#f5c2e7"
+    stroke-width="6"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M50 82.5 L81.11 51.39 A20 20 0 0 0 52.83 23.1 L21.72 54.22 Z"
+    fill="#b4befe"
+    stroke="#b4befe"
+    stroke-width="6"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M50 82.5 L21.72 54.22 L50 25.93 L78.28 54.22 Z"
+    fill="#f38ba8"
+    stroke="#f38ba8"
+    stroke-width="6"
+    stroke-linejoin="round"
+  /></svg>

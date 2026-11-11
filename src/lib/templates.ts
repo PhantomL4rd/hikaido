@@ -426,7 +426,7 @@ export const templates: Template[] = [
   {
     id: "t053",
     category: "交流",
-    question: "{name}の誘うときは？",
+    question: "{name}が誘うときは？",
     choiceA: "自分から声をかける",
     choiceB: "誘いを待つ",
     type: "normal",
@@ -822,7 +822,7 @@ export const templates: Template[] = [
   {
     id: "t099",
     category: "バトル",
-    question: "{name}新パッチでまず楽しみたいのは？",
+    question: "{name}が新パッチでまず楽しみたいのは？",
     choiceA: "新しいボスとの戦い",
     choiceB: "新しいおしゃれ装備",
     type: "normal",
@@ -831,7 +831,7 @@ export const templates: Template[] = [
   {
     id: "t100",
     category: "バトル",
-    question: "{name}じっくり取り組むなら？",
+    question: "{name}がじっくり取り組むなら？",
     choiceA: "レイド攻略",
     choiceB: "理想の部屋づくり",
     type: "normal",
@@ -840,7 +840,7 @@ export const templates: Template[] = [
   {
     id: "t101",
     category: "バトル",
-    question: "{name}達成感があるのは？",
+    question: "{name}が達成感を感じるのは？",
     choiceA: "強敵を倒せたとき",
     choiceB: "難しい製作に成功したとき",
     type: "normal",
@@ -849,7 +849,7 @@ export const templates: Template[] = [
   {
     id: "t102",
     category: "探索",
-    question: "{name}冒険に出るなら？",
+    question: "{name}が冒険に出るなら？",
     choiceA: "歯ごたえのある戦闘",
     choiceB: "未踏の場所を探索",
     type: "normal",
@@ -858,7 +858,7 @@ export const templates: Template[] = [
   {
     id: "t103",
     category: "住居",
-    question: "{name}新しい家具が増えたら？",
+    question: "{name}が新しい家具が増えたら？",
     choiceA: "部屋にどう配置するか考える",
     choiceB: "自分で作ってみる",
     type: "normal",
@@ -867,7 +867,7 @@ export const templates: Template[] = [
   {
     id: "t104",
     category: "住居",
-    question: "{name}休日に没頭するなら？",
+    question: "{name}が休日に没頭するなら？",
     choiceA: "内装の模様替え",
     choiceB: "クエストの物語",
     type: "normal",
@@ -876,7 +876,7 @@ export const templates: Template[] = [
   {
     id: "t105",
     category: "探索",
-    question: "{name}景色を楽しむなら？",
+    question: "{name}が景色を楽しむなら？",
     choiceA: "自分好みの庭を作る",
     choiceB: "気になる風景を探しに行く",
     type: "normal",
@@ -885,7 +885,7 @@ export const templates: Template[] = [
   {
     id: "t106",
     category: "製作",
-    question: "{name}空いた時間に進めたいのは？",
+    question: "{name}が空いた時間に進めたいのは？",
     choiceA: "採集や製作",
     choiceB: "続きが気になるクエスト",
     type: "normal",
@@ -894,7 +894,7 @@ export const templates: Template[] = [
   {
     id: "t107",
     category: "探索",
-    question: "{name}新エリアでまずしたいのは？",
+    question: "{name}が新エリアでまずしたいのは？",
     choiceA: "採集できる素材を調べる",
     choiceB: "隅々まで歩いてみる",
     type: "normal",
@@ -903,7 +903,7 @@ export const templates: Template[] = [
   {
     id: "t108",
     category: "物語",
-    question: "{name}寄り道するなら？",
+    question: "{name}が寄り道するなら？",
     choiceA: "サブクエストの物語を読む",
     choiceB: "地図で気になった場所へ行く",
     type: "normal",
@@ -912,7 +912,7 @@ export const templates: Template[] = [
   {
     id: "t109",
     category: "装い",
-    question: "{name}新しい装備で気になるのは？",
+    question: "{name}が新しい装備で気になるのは？",
     choiceA: "説明文にある背景や物語",
     choiceB: "ミラプリに使える見た目",
     type: "normal",

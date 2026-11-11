@@ -268,3 +268,9 @@ it("差し替え時は回答を消し、ほかの採用問題とは重複しな�
   expect(new Set(next.map((q) => q.id)).size).toBe(25);
   expect(next[4].id).not.toBe(draft[4].id);
 });
+
+it("新エリアの問題は名前の後に助詞が続く", () => {
+  expect(templates.find((t) => t.id === "t107")?.question).toBe(
+    "{name}が新エリアでまずしたいのは？",
+  );
+});

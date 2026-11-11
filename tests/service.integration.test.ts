@@ -478,3 +478,33 @@ it("通常問題の回答も公開時の診断タイプに保存する", async (
     expect(saved?.hikansen_type).toBe(expected);
   }
 });
+
+it("文面移行は公開済みクイズの助詞だけを直し、再実行しても同じ状態になる", async () => {
+  const q = await create();
+  const id = q.quiz.questions[0].id;
+  await config.DB.prepare(
+    "UPDATE questions SET template_id='t107',question_snapshot=? WHERE id=?",
+  )
+    .bind("ひろし新エリアでまずしたいのは？", id)
+    .run();
+  const before = await config.DB.prepare("SELECT * FROM questions WHERE id=?")
+    .bind(id)
+    .first();
+  const statements = readFileSync(
+    "drizzle/0003_fix_question_particles.sql",
+    "utf8",
+  )
+    .split("--> statement-breakpoint")
+    .filter((s) => s.trim());
+  for (let i = 0; i < 2; i++) {
+    await config.DB.batch(statements.map((s) => config.DB.prepare(s)));
+    expect(
+      await config.DB.prepare("SELECT * FROM questions WHERE id=?")
+        .bind(id)
+        .first(),
+    ).toEqual({
+      ...before,
+      question_snapshot: "ひろしが新エリアでまずしたいのは？",
+    });
+  }
+});

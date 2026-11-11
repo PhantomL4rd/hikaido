@@ -102,8 +102,6 @@ onMount(() => {
 </dialog>
 <main>{@render children()}</main>
 <footer>
-  <a href={`${base}/about`}>このサイトについて</a><span> · </span
-  ><a href="https://contact.pl4rd.com/?service=hikaido">お問い合わせ</a>
   <p>HIKAIDO · FINAL FANTASY XIV 非公式ファンサービス</p>
   <p>
     着想元：<a href="https://rikaido.me/" target="_blank" rel="noreferrer"

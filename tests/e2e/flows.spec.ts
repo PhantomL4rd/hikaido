@@ -231,9 +231,23 @@ test("通報・連投制限とお問い合わせを受け付ける", async ({ re
     "https://contact.pl4rd.com/?service=hikaido",
   );
   await page.goto(`${root}/`);
+  const footer = page.locator("footer");
+  await expect(footer.getByRole("link", { name: "お問い合わせ" })).toHaveCount(
+    0,
+  );
   await expect(
-    page.locator("footer").getByRole("link", { name: "お問い合わせ" }),
+    footer.getByRole("link", { name: "このサイトについて" }),
+  ).toHaveCount(0);
+  await expect(
+    footer.getByRole("link", { name: "リカイド", exact: true }),
+  ).toHaveAttribute("href", "https://rikaido.me/");
+  await page.getByRole("button", { name: "メニューを開く" }).click();
+  await expect(
+    page.getByRole("dialog").getByRole("link", { name: "お問い合わせ" }),
   ).toHaveAttribute("href", "https://contact.pl4rd.com/?service=hikaido");
+  await expect(
+    page.getByRole("dialog").getByRole("link", { name: "このサイトについて" }),
+  ).toBeVisible();
 
   await request.delete(`${root}/api/quizzes/${q.id}`, {
     headers: { ...headers, authorization: `Bearer ${q.token}` },

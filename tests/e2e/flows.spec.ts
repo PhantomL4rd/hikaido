@@ -13,11 +13,17 @@ async function publish(
     ...templates.filter((t) => t.type === "diagnosis"),
     ...templates.filter((t) => t.type === "normal").slice(0, n - 4),
   ];
+  const entryResponse = await request.post(`${root}/api/publish-entry`, {
+    data: { managementToken: token },
+  });
+  expect(entryResponse.ok()).toBe(true);
+  const entry = await entryResponse.json();
   const r = await request.post(`${root}/api/quizzes`, {
     headers,
     data: {
       characterName: "テストのヒカセン",
       managementToken: token,
+      ...entry,
       questions: qs.map((t) => ({ templateId: t.id, answer: "A" })),
     },
   });
@@ -75,12 +81,12 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     await friend.locator(".choice").first().click();
     await expect(friend.locator(".reaction")).toHaveCount(0);
     await friend
-      .getByRole("button", { name: i === 9 ? "自分のこたえをみる" : "つぎへ" })
+      .getByRole("button", { name: i === 9 ? "結果を見る" : "つぎへ" })
       .click();
   }
-  await friend
-    .getByRole("button", { name: "回答を確定して結果を見る" })
-    .click();
+  await expect(
+    friend.getByRole("button", { name: "回答を確定して結果を見る" }),
+  ).toHaveCount(0);
   await expect(friend.locator(".score")).toContainText("100");
   await expect(friend.locator(".result-question")).toHaveCount(0);
   await expect(friend.getByText("正解：", { exact: false })).toHaveCount(0);
@@ -162,10 +168,12 @@ test("25問・正解秘匿・冪等性・権限・統計削除・不正入力", 
   for (let i = 0; i < 25; i++) {
     await page.locator(".choice").first().click();
     await page
-      .getByRole("button", { name: i === 24 ? "自分のこたえをみる" : "つぎへ" })
+      .getByRole("button", { name: i === 24 ? "結果を見る" : "つぎへ" })
       .click();
   }
-  await page.getByRole("button", { name: "回答を確定して結果を見る" }).click();
+  await expect(
+    page.getByRole("button", { name: "回答を確定して結果を見る" }),
+  ).toHaveCount(0);
   await expect(page.locator(".score")).toContainText("100");
   const saved = await page.evaluate(
     (id) => JSON.parse(localStorage.getItem(`hikaido-answer-${id}`)!),
@@ -184,7 +192,7 @@ test("25問・正解秘匿・冪等性・権限・統計削除・不正入力", 
     respondentName: "再送テスト",
     idempotencyKey: saved.idempotencyKey,
     resultToken: saved.resultToken,
-    answers: detail.questions.map((x: { id: string }) => ({
+    answers: detail.quiz.questions.map((x: { id: string }) => ({
       questionId: x.id,
       choice: "A",
     })),

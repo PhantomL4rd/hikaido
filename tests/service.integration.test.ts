@@ -4,6 +4,8 @@ import { getPlatformProxy } from "wrangler";
 import { retryNotifications } from "../src/lib/server/notifications";
 import type { ServiceEvent } from "../src/lib/server/security";
 import {
+  beginAnswer,
+  beginPublish,
   contact,
   creatorReaction,
   manage,
@@ -75,6 +77,7 @@ async function create(n = 10, correct: "A" | "B" = "A") {
     event({
       characterName: "ひろし",
       managementToken: token,
+      ...(await beginPublish(event({ managementToken: token }))),
       questions: chosen.map((t) => ({ templateId: t.id, answer: correct })),
     }),
   );
@@ -90,6 +93,10 @@ async function answer(
     respondentName: `友達${serial}`,
     idempotencyKey: key,
     resultToken: token,
+    ...(await beginAnswer(
+      event({ idempotencyKey: key, resultToken: token }),
+      q.id,
+    )),
     answers: q.quiz.questions.map((x) => ({ questionId: x.id, choice })),
   };
   return { ...(await submit(event(body), q.id)), token, body };
@@ -148,10 +155,16 @@ it("作成者は全問題の正答率を確認でき、回答削除後は再集�
       (s) => s.total === 2 && s.correctCount === 1 && s.correctRate === 50,
     ),
   ).toBe(true);
+  const variedKey = crypto.randomUUID();
+  const entry = await beginAnswer(
+    event({ idempotencyKey: variedKey, resultToken: "s".repeat(64) }),
+    q.id,
+  );
   await submit(
     event({
+      ...entry,
       respondentName: "問題ごとに違う回答",
-      idempotencyKey: crypto.randomUUID(),
+      idempotencyKey: variedKey,
       resultToken: "s".repeat(64),
       answers: q.quiz.questions.map((question, i) => ({
         questionId: question.id,
@@ -466,6 +479,7 @@ it("通常問題の回答も公開時の診断タイプに保存する", async (
       event({
         characterName: "ひろし",
         managementToken: "m".repeat(64),
+        ...(await beginPublish(event({ managementToken: "m".repeat(64) }))),
         questions: [
           "t001",
           "t002",
@@ -542,4 +556,95 @@ it("出題者の回答傾向は同じ問題の公開クイズだけを集計す�
   await remove(event(undefined, seeds[2].token), seeds[2].id);
   expect(await lookup("A")).toEqual({ reaction: "まだ集計中！" });
   await expect(lookup("A", "unknown")).rejects.toMatchObject({ status: 404 });
+});
+
+it("入口でTurnstileを検証し、署名付き許可なしの公開・回答送信を拒否する", async () => {
+  const q = await create();
+  const a = await answer(q);
+  const entryEvent = (body: unknown) => {
+    const e = event(body);
+    e.locals = {
+      ...e.locals,
+      env: {
+        ...config,
+        LOCAL_TEST_MODE: "false",
+        TURNSTILE_SECRET_KEY: "entry-test-secret",
+        TURNSTILE_HOSTNAME: "hikaido.pl4rd.com",
+      },
+    };
+    return e;
+  };
+  const send = vi
+    .fn()
+    .mockImplementation(() =>
+      Promise.resolve(new Response(JSON.stringify({ success: false }))),
+    );
+  vi.stubGlobal("fetch", send);
+  const key = crypto.randomUUID();
+  await expect(
+    beginAnswer(
+      entryEvent({
+        idempotencyKey: key,
+        resultToken: a.token,
+        turnstile: "bad",
+      }),
+      q.id,
+    ),
+  ).rejects.toMatchObject({ status: 403 });
+  send.mockImplementation(() =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify({
+          success: true,
+          action: "answer",
+          hostname: "hikaido.pl4rd.com",
+        }),
+      ),
+    ),
+  );
+  const entry = await beginAnswer(
+    entryEvent({
+      idempotencyKey: key,
+      resultToken: a.token,
+      turnstile: "fresh",
+    }),
+    q.id,
+  );
+  const calls = send.mock.calls.length;
+  const body = { ...a.body, idempotencyKey: key, ...entry };
+  await expect(
+    submit(entryEvent({ ...body, answerPermit: "" }), q.id),
+  ).rejects.toMatchObject({ status: 403 });
+  const submitted = await submit(entryEvent(body), q.id);
+  expect(send.mock.calls).toHaveLength(calls);
+  expect(await submit(entryEvent(body), q.id)).toEqual(submitted);
+  send.mockImplementation(() =>
+    Promise.resolve(
+      new Response(
+        JSON.stringify({
+          success: true,
+          action: "publish",
+          hostname: "hikaido.pl4rd.com",
+        }),
+      ),
+    ),
+  );
+  const ownerEntry = await beginPublish(
+    entryEvent({ managementToken: q.token, turnstile: "fresh" }),
+  );
+  const questions = templates
+    .filter((t) => t.type === "diagnosis")
+    .concat(templates.filter((t) => t.type === "normal").slice(0, 6))
+    .map((t) => ({ templateId: t.id, answer: "A" }));
+  const publishBody = {
+    managementToken: q.token,
+    characterName: "入口テスト",
+    questions,
+    ...ownerEntry,
+  };
+  await expect(
+    publish(entryEvent({ ...publishBody, publishPermit: "" })),
+  ).rejects.toMatchObject({ status: 403 });
+  const published = await publish(entryEvent(publishBody));
+  expect(await publish(entryEvent(publishBody))).toEqual(published);
 });

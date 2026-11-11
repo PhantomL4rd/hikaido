@@ -1,5 +1,7 @@
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 import {
+  beginAnswer,
+  beginPublish,
   contact,
   creatorReaction,
   manage,
@@ -22,12 +24,14 @@ export const GET: RequestHandler = async (e) => {
 };
 export const POST: RequestHandler = async (e) => {
   const [resource, id, action, rid, operation] = e.params.path!.split("/");
+  if (resource === "publish-entry" && !id) return json(await beginPublish(e));
   if (resource === "creator-reaction" && !id)
     return json(await creatorReaction(e));
   if (resource === "quizzes") {
     if (id && action === "result" && rid && operation === "share")
       return json(await shareResult(e, id, rid), { status: 201 });
     if (!id) return json(await publish(e), { status: 201 });
+    if (action === "answer-entry") return json(await beginAnswer(e, id));
     if (action === "responses")
       return json(await submit(e, id), { status: 201 });
   }

@@ -18,8 +18,14 @@ export const nameSchema = v.pipe(
 );
 export const choiceSchema = v.picklist(["A", "B"]);
 const secret = v.pipe(v.string(), v.minLength(32), v.maxLength(128));
+export const publishEntrySchema = v.object({
+  managementToken: secret,
+  turnstile: v.optional(v.string(), ""),
+});
 export const publishSchema = v.object({
   characterName: nameSchema,
+  publishId: v.optional(v.pipe(v.string(), v.uuid())),
+  publishPermit: v.optional(v.pipe(v.string(), v.maxLength(1024)), ""),
   questions: v.pipe(
     v.array(v.object({ templateId: v.string(), answer: choiceSchema })),
     v.minLength(10),
@@ -28,8 +34,14 @@ export const publishSchema = v.object({
   managementToken: secret,
   turnstile: v.optional(v.string(), ""),
 });
+export const answerEntrySchema = v.object({
+  idempotencyKey: v.pipe(v.string(), v.uuid()),
+  resultToken: secret,
+  turnstile: v.optional(v.string(), ""),
+});
 export const answerSchema = v.object({
   respondentName: nameSchema,
+  answerPermit: v.optional(v.pipe(v.string(), v.maxLength(1024)), ""),
   answers: v.pipe(
     v.array(v.object({ questionId: v.string(), choice: choiceSchema })),
     v.minLength(10),

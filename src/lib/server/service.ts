@@ -6,11 +6,14 @@ import { diagnose, reaction } from "#lib/domain";
 import { origin } from "#lib/paths";
 import { templates } from "#lib/templates";
 import {
+  answerEntrySchema,
   answerSchema,
   contactSchema,
+  publishEntrySchema,
   publishSchema,
   reportSchema,
 } from "#lib/validation";
+import { issueAnswerPermit, verifyAnswerPermit } from "./answer-permit";
 import { retryNotifications } from "./notifications";
 import {
   contacts,
@@ -107,10 +110,24 @@ export async function respondents(e: ServiceEvent, id: string) {
         : null,
   };
 }
+export async function beginPublish(e: ServiceEvent) {
+  await rate(e, "publish-entry", 8, 3600);
+  const data = await read(e, publishEntrySchema);
+  await turnstile(e, data.turnstile, "publish");
+  const publishId = crypto.randomUUID();
+  return {
+    publishId,
+    publishPermit: await issueAnswerPermit(
+      answerPermitSecret(e),
+      publishId,
+      "publish",
+      data.managementToken,
+    ),
+  };
+}
 export async function publish(e: ServiceEvent) {
   await rate(e, "publish", 8, 3600);
   const data = await read(e, publishSchema);
-  await turnstile(e, data.turnstile, "publish");
   const n = data.questions.length;
   if (n !== 10 && n !== 25) error(400, "10問または25問を選んでください");
   if (new Set(data.questions.map((q) => q.templateId)).size !== n)
@@ -126,8 +143,25 @@ export async function publish(e: ServiceEvent) {
     chosen.slice(4).some((q) => q.type === "diagnosis")
   )
     error(400, "診断問題が不正です");
-  const id = crypto.randomUUID();
+  if (
+    !data.publishId ||
+    !(await verifyAnswerPermit(
+      answerPermitSecret(e),
+      data.publishPermit,
+      data.publishId,
+      "publish",
+      data.managementToken,
+    ))
+  )
+    error(403, "入口で認証し直してください。下書きは保存されています。");
+  const id = data.publishId;
   const db = database(e);
+  const [existing] = await db.select().from(quizzes).where(eq(quizzes.id, id));
+  if (existing) {
+    if (!(await verify(data.managementToken, existing.managementTokenHash)))
+      error(403, "公開の認証情報が一致しません");
+    return { id };
+  }
   await db.batch([
     db.insert(quizzes).values({
       id,
@@ -154,6 +188,30 @@ export async function publish(e: ServiceEvent) {
   ]);
   return { id };
 }
+function answerPermitSecret(e: ServiceEvent) {
+  const config = env(e);
+  if (config.TURNSTILE_SECRET_KEY) return config.TURNSTILE_SECRET_KEY;
+  if (
+    config.LOCAL_TEST_MODE === "true" &&
+    ["localhost", "127.0.0.1"].includes(e.url.hostname)
+  )
+    return "local-only-answer-permit";
+  error(503, "認証の設定が必要です");
+}
+export async function beginAnswer(e: ServiceEvent, id: string) {
+  await rate(e, "answer-entry", 60, 3600);
+  const data = await read(e, answerEntrySchema);
+  await publicQuiz(e, id);
+  await turnstile(e, data.turnstile, "answer");
+  return {
+    answerPermit: await issueAnswerPermit(
+      answerPermitSecret(e),
+      id,
+      data.idempotencyKey,
+      data.resultToken,
+    ),
+  };
+}
 export async function submit(e: ServiceEvent, id: string) {
   await rate(e, "answer", 60, 3600);
   const data = await read(e, answerSchema);
@@ -173,7 +231,6 @@ export async function submit(e: ServiceEvent, id: string) {
       error(409, "再送の秘密情報が一致しません");
     return { id: existing.id };
   }
-  await turnstile(e, data.turnstile, "answer");
   const qs = await db
     .select()
     .from(questions)
@@ -185,6 +242,16 @@ export async function submit(e: ServiceEvent, id: string) {
     !qs.every((q) => data.answers.some((a) => a.questionId === q.id))
   )
     error(400, "全問に回答してください");
+  if (
+    !(await verifyAnswerPermit(
+      answerPermitSecret(e),
+      data.answerPermit,
+      id,
+      data.idempotencyKey,
+      data.resultToken,
+    ))
+  )
+    error(403, "入口で認証し直してください。回答は保存されています。");
   const rid = crypto.randomUUID();
   const answers = qs.map((q) => {
     const choice = data.answers.find((a) => a.questionId === q.id)!.choice;

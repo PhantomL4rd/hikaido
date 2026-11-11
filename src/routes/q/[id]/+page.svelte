@@ -18,7 +18,7 @@ let name = $state(""),
   answers = $state<Record<string, Choice>>({}),
   busy = $state(false),
   message = $state(""),
-  review = $state(false),
+  answerPermit = $state(""),
   token = $state(""),
   reset = $state(0),
   idempotencyKey = $state(""),
@@ -62,7 +62,8 @@ $effect(() => {
       responseId: existing,
     });
 });
-function start() {
+async function start() {
+  if (busy) return;
   const r = v.safeParse(nameSchema, name);
   if (!r.success) {
     message = r.issues[0].message;
@@ -70,12 +71,27 @@ function start() {
   }
   name = r.output;
   message = "";
-  started = true;
+  busy = true;
+  try {
+    const entry = await api<{ answerPermit: string }>(
+      `quizzes/${data.quiz.id}/answer-entry`,
+      "POST",
+      { idempotencyKey, resultToken, turnstile: token },
+    );
+    answerPermit = entry.answerPermit;
+    started = true;
+  } catch (e) {
+    message = (e as Error).message;
+  } finally {
+    busy = false;
+    reset++;
+  }
 }
 function choose(choice: Choice) {
   answers[current.id] = choice;
 }
 async function submit() {
+  if (busy) return;
   busy = true;
   message = "";
   try {
@@ -90,7 +106,7 @@ async function submit() {
         })),
         idempotencyKey,
         resultToken,
-        turnstile: token,
+        answerPermit,
       },
     );
     existing = r.id;
@@ -105,6 +121,7 @@ async function submit() {
     await goto(`${base}/q/${data.quiz.id}/result/${r.id}`);
   } catch (e) {
     message = (e as Error).message;
+    if (message.includes("入口")) started = false;
   } finally {
     busy = false;
     reset++;
@@ -158,7 +175,17 @@ async function submit() {
           >答えたあとは、名前・正解数・理解度・答えた日時が回答者一覧に載ります。一覧は誰でも見られるので、公開してもよい名前で遊んでね。</small
         >
       </p>
-      <button type="submit" class="primary full">
+      <Turnstile
+        sitekey={data.sitekey}
+        action="answer"
+        bind:token
+        resetKey={reset}
+      />
+      <button
+        type="submit"
+        class="primary full"
+        disabled={busy || !ready || (!!data.sitekey && !token)}
+      >
         挑戦する <Icon name="ArrowRight" size={16} />
       </button>
     </form>
@@ -176,45 +203,6 @@ async function submit() {
       >URLを知っていれば、誰でも遊べます。「理解度」は、本人の答えとどれくらい同じだったかを表しています。</small
     >
   </p>
-{:else if review}
-  <h1>この回答で、結果を見る？</h1>
-  <section class="card">
-    <ul class="list">
-      {#each data.quiz.questions as q, i}
-        <li>
-          <strong>{q.question}</strong>
-          <div class="row between">
-            <span>{answers[q.id] === "A" ? q.choiceA : q.choiceB}</span
-            ><button
-              type="button"
-              onclick={() => {
-                position = i;
-                review = false;
-              }}
-            >
-              変更
-            </button>
-          </div>
-        </li>
-      {/each}
-    </ul>
-    <p>
-      「{name}」の名前・正解数・理解度・答えた日時が、誰でも見られる回答者一覧に載ります。
-    </p>
-    <Turnstile
-      sitekey={data.sitekey}
-      action="answer"
-      bind:token
-      resetKey={reset}
-    /><button
-      type="button"
-      class="primary full"
-      onclick={submit}
-      disabled={busy}
-    >
-      {busy ? "集計しています…" : "回答を確定して結果を見る"}
-    </button>
-  </section>
 {:else}
   <div class="progress-label">
     <span>{data.quiz.characterName}なら、どっち？</span
@@ -232,6 +220,7 @@ async function submit() {
         <button
           type="button"
           class="choice"
+          disabled={busy}
           aria-pressed={answers[current.id] === "A"}
           onclick={() => choose("A")}
         >
@@ -239,6 +228,7 @@ async function submit() {
         </button><button
           type="button"
           class="choice"
+          disabled={busy}
           aria-pressed={answers[current.id] === "B"}
           onclick={() => choose("B")}
         >
@@ -250,6 +240,7 @@ async function submit() {
   <div class="actions">
     <button
       type="button"
+      disabled={busy}
       onclick={() => {
         if (position > 0) position--;
         else started = false;
@@ -259,14 +250,16 @@ async function submit() {
     </button><button
       type="button"
       class="primary"
-      disabled={!answers[current.id]}
+      disabled={!answers[current.id] || busy}
       onclick={() => {
         if (position < data.quiz.questionCount - 1) position++;
-        else review = true;
+        else void submit();
       }}
     >
       {position === data.quiz.questionCount - 1
-        ? "自分のこたえをみる"
+        ? busy
+          ? "結果を開いています…"
+          : "結果を見る"
         : "つぎへ"}
     </button>
   </div>

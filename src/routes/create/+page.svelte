@@ -27,6 +27,9 @@ let name = $state(""),
   message = $state(""),
   busy = $state(false),
   token = $state(""),
+  managementToken = $state(""),
+  publishId = $state(""),
+  publishPermit = $state(""),
   reset = $state(0),
   published = $state(""),
   reduced = $state(true),
@@ -39,6 +42,9 @@ onMount(() => {
     draft: DraftQuestion[];
     position: number;
     stage: string;
+    managementToken?: string;
+    publishId?: string;
+    publishPermit?: string;
   } | null>("hikaido-draft", null);
   if (d) {
     name = d.name;
@@ -46,12 +52,24 @@ onMount(() => {
     draft = d.draft;
     position = d.position;
     stage = d.stage;
+    managementToken = d.managementToken || "";
+    publishId = d.publishId || "";
+    publishPermit = d.publishPermit || "";
   }
   ready = true;
 });
 $effect(() => {
   if (ready && stage !== "published")
-    save("hikaido-draft", { name, count, draft, position, stage });
+    save("hikaido-draft", {
+      name,
+      count,
+      draft,
+      position,
+      stage,
+      managementToken,
+      publishId,
+      publishPermit,
+    });
 });
 const current = $derived(draft[position]);
 const type = $derived(
@@ -62,7 +80,8 @@ const type = $derived(
       )
     : undefined,
 );
-function start() {
+async function start() {
+  if (busy) return;
   const n = v.safeParse(nameSchema, name);
   if (!n.success) {
     message = n.issues[0].message;
@@ -70,9 +89,27 @@ function start() {
   }
   name = n.output;
   message = "";
-  draft = makeDraft(count);
-  position = 0;
-  stage = "questions";
+  busy = true;
+  try {
+    if (!managementToken) managementToken = secret();
+    const entry = await api<{ publishId: string; publishPermit: string }>(
+      "publish-entry",
+      "POST",
+      { managementToken, turnstile: token },
+    );
+    publishId = entry.publishId;
+    publishPermit = entry.publishPermit;
+    if (draft.length !== count) {
+      draft = makeDraft(count);
+      position = 0;
+    }
+    stage = "questions";
+  } catch (e) {
+    message = (e as Error).message;
+  } finally {
+    busy = false;
+    reset++;
+  }
 }
 function select(choice: Choice) {
   draft[position].answer = choice;
@@ -92,14 +129,20 @@ async function publish() {
   busy = true;
   message = "";
   try {
-    const managementToken = secret();
+    if (!publishPermit) {
+      stage = "setup";
+      message =
+        "入口で認証してから、続きを進めてね。下書きは保存されています。";
+      return;
+    }
     const owned = load<Owned[]>("hikaido-owned", []);
     save("hikaido-pending-owner", { token: managementToken, name });
     const r = await api<{ id: string }>("quizzes", "POST", {
       characterName: name,
       questions: draft.map((q) => ({ templateId: q.id, answer: q.answer })),
       managementToken,
-      turnstile: token,
+      publishId,
+      publishPermit,
     });
     save("hikaido-owned", [
       ...owned,
@@ -111,6 +154,7 @@ async function publish() {
     stage = "published";
   } catch (e) {
     message = (e as Error).message;
+    if (message.includes("入口")) stage = "setup";
   } finally {
     busy = false;
     reset++;
@@ -148,8 +192,18 @@ function url() {
       <option value={10}>10問 · さくっとコース</option>
       <option value={25}>25問 · じっくりコース</option>
     </select>
+    <Turnstile
+      sitekey={data.sitekey}
+      action="publish"
+      bind:token
+      resetKey={reset}
+    />
     <p>
-      <button type="submit" class="primary full">
+      <button
+        type="submit"
+        class="primary full"
+        disabled={busy || !ready || (!!data.sitekey && !token)}
+      >
         2択をはじめる <Icon name="ArrowRight" size={16} />
       </button>
     </p>
@@ -274,12 +328,7 @@ function url() {
         >あとからクイズを削除できるように、このブラウザに情報を保存します。ブラウザのデータを消すと削除できなくなるので、そのまま残しておいてね。</small
       >
     </p>
-    <Turnstile
-      sitekey={data.sitekey}
-      action="publish"
-      bind:token
-      resetKey={reset}
-    /><button
+    <button
       type="button"
       class="primary full"
       disabled={busy}

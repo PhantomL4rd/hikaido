@@ -48,10 +48,16 @@ test("クイズ別OGPは1200×630のPNGを生成し削除後は配信しない",
     ...templates.filter((t) => t.type === "diagnosis"),
     ...templates.filter((t) => t.type === "normal").slice(0, 6),
   ];
+  const entryResponse = await request.post(`${root}/api/publish-entry`, {
+    data: { managementToken: token },
+  });
+  expect(entryResponse.ok()).toBe(true);
+  const entry = await entryResponse.json();
   const published = await request.post(`${root}/api/quizzes`, {
     data: {
       characterName: "朝比奈 ひかり",
       managementToken: token,
+      ...entry,
       questions: qs.map((t) => ({ templateId: t.id, answer: "A" })),
     },
   });

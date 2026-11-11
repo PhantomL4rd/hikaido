@@ -1,6 +1,6 @@
 <script lang="ts">
 import "../app.css";
-import { ModeWatcher, mode, toggleMode } from "mode-watcher";
+import { ModeWatcher, resetMode } from "mode-watcher";
 import { onMount } from "svelte";
 import Brand from "#lib/components/Brand.svelte";
 import Icon from "#lib/components/Icon.svelte";
@@ -18,6 +18,7 @@ let { children } = $props();
 let drawer: HTMLDialogElement;
 let ready = $state(false);
 onMount(() => {
+  resetMode();
   ready = true;
 });
 </script>
@@ -43,14 +44,6 @@ onMount(() => {
     <a class="home-link" href={`${base}/`}><Brand /></a>
     <div class="row">
       <button
-        type="button"
-        class="icon-button"
-        onclick={toggleMode}
-        aria-label="配色を切り替える"
-        disabled={!ready}
-      >
-        <Icon name={mode.current === "dark" ? "Sun" : "Moon"} />
-      </button><button
         type="button"
         class="icon-button"
         onclick={() => drawer.showModal()}

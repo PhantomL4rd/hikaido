@@ -73,7 +73,7 @@ Catppuccin Latte/Macchiatoを採用。カララントピッカー・4seasonsと�
 
 ## 共通ヘッダーと配色設定
 
-最上部の非公式サービス・無料・ログイン不要の帯は表示しない。ライト／ダークはmode-watcherで管理する。初期値はOS設定に追従し、OS設定変更にも追従する。手動の選択は既存のhikaido-themeキーに保存して再読み込み時にも復元する。明度切り替えはヘッダーのボタンからmode-watcherのtoggleModeで行い、メニュー内の配色設定は表示しない。初期描画前の配色適用とブラウザのtheme-color更新もmode-watcherに任せる。
+最上部の非公式サービス・無料・ログイン不要の帯は表示しない。ライト／ダークはmode-watcherで管理する。OS設定とその変更に追従する。ヘッダーの明度切り替えボタンとメニュー内の配色設定は表示しない。過去に保存した手動設定はmode-watcherのresetModeでOS設定に戻す。初期描画前の配色適用とブラウザのtheme-color更新もmode-watcherに任せる。
 
 ## 共通お問い合わせへの移行
 

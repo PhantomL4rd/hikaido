@@ -143,6 +143,7 @@ it("作成者は全問題の正答率を確認でき、回答削除後は再集�
   expect(empty.questionStats[0]).toEqual({
     id: q.quiz.questions[0].id,
     question: q.quiz.questions[0].question,
+    answer: q.quiz.questions[0].choiceA,
     total: 0,
     correctCount: 0,
     correctRate: null,
@@ -193,6 +194,13 @@ it("作成者は全問題の正答率を確認でき、回答削除後は再集�
         s.correctRate === (i === 0 ? 0 : 50),
     ),
   ).toBe(true);
+});
+it("作成者はBを選んだ問題も公開時の答えの内容を確認できる", async () => {
+  const q = await create(10, "B");
+  const managed = await manage(event(undefined, q.token), q.id);
+  expect(managed.questionStats.map((s) => s.answer)).toEqual(
+    q.quiz.questions.map((question) => question.choiceB),
+  );
 });
 it("回答者の正答率は削除後に再集計する", async () => {
   const q = await create(10, "B");
@@ -563,14 +571,11 @@ it("入口でTurnstileを検証し、署名付き許可なしの公開・回答�
   const a = await answer(q);
   const entryEvent = (body: unknown) => {
     const e = event(body);
-    e.locals = {
-      ...e.locals,
-      env: {
-        ...config,
-        LOCAL_TEST_MODE: "false",
-        TURNSTILE_SECRET_KEY: "entry-test-secret",
-        TURNSTILE_HOSTNAME: "hikaido.pl4rd.com",
-      },
+    e.locals.env = {
+      ...config,
+      LOCAL_TEST_MODE: "false",
+      TURNSTILE_SECRET_KEY: "entry-test-secret",
+      TURNSTILE_HOSTNAME: "hikaido.pl4rd.com",
     };
     return e;
   };

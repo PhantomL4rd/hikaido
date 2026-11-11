@@ -348,6 +348,7 @@ export async function manage(e: ServiceEvent, id: string) {
     .select({
       id: questions.id,
       question: questions.question,
+      answer: sql<string>`case when ${questions.correctChoice} = 'A' then ${questions.choiceA} else ${questions.choiceB} end`,
       total: sql<number>`count(${responseAnswers.responseId})`,
       correctCount: sql<number>`coalesce(sum(${responseAnswers.isCorrect}), 0)`,
     })

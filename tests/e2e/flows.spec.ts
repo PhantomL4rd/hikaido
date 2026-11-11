@@ -115,9 +115,21 @@ test("10問作成、下書き復元、変更、公開、挑戦、結果、管理
     .getByRole("link", { name: "フレンドのこたえをみる", exact: true })
     .click();
   await expect(page.getByText("友達", { exact: true })).toBeVisible();
-  const questionStats = page
-    .locator("section")
-    .filter({ has: page.getByRole("heading", { name: "問題ごとの正答率" }) });
+  const questionStats = page.locator("details").filter({
+    has: page.locator("summary", { hasText: "みんなはどのくらい正解した？" }),
+  });
+  const statsToggle = questionStats.locator("summary");
+  await expect(questionStats).not.toHaveAttribute("open");
+  await expect(questionStats.locator("ol")).toBeHidden();
+  await statsToggle.click();
+  await expect(questionStats.locator("ol")).toBeVisible();
+  await expect(
+    questionStats.getByText("あなたの答え：", { exact: false }),
+  ).toHaveCount(10);
+  await statsToggle.press("Enter");
+  await expect(questionStats.locator("ol")).toBeHidden();
+  await statsToggle.press("Space");
+  await expect(questionStats.locator("ol")).toBeVisible();
   await expect(questionStats.getByRole("listitem")).toHaveCount(10);
   await expect(
     questionStats.getByText("正答率 100%", { exact: true }),

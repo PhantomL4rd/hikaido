@@ -124,16 +124,17 @@ async function remove() {
       </button>
     {/if}
   </section>
-  <section class="card">
-    <h2>問題ごとの正答率</h2>
+  <details class="card">
+    <summary>みんなはどのくらい正解した？</summary>
     <p class="muted">
-      これまでのフレンド全員のこたえを集計しています。削除した回答は含みません。
+      これまでに届いたフレンドのこたえをまとめたよ。削除したこたえは入っていません。
     </p>
     <!-- biome-ignore lint/a11y/noRedundantRoles: list-styleなしでもSafariにリストとして伝えるため -->
     <ol class="list" role="list">
       {#each data.questionStats as q, i (q.id)}
         <li>
           <h3>第{i + 1}問：{q.question}</h3>
+          <p>あなたの答え：{q.answer}</p>
           {#if q.correctRate === null}
             <p class="muted">まだ回答がありません。</p>
           {:else}
@@ -145,7 +146,7 @@ async function remove() {
         </li>
       {/each}
     </ol>
-  </section>
+  </details>
   <button type="button" class="danger full" onclick={() => confirm()}>
     クイズ全体を削除
   </button>
@@ -175,3 +176,12 @@ async function remove() {
 {#if message}
   <p role="alert" class="error">{message}</p>
 {/if}
+
+<style>
+summary {
+  cursor: pointer;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+</style>

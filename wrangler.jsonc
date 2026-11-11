@@ -19,6 +19,7 @@
     }
   ],
   "vars": {
+    "PUBLIC_SENTRY_DSN": "https://bd90508b295420f037a4fdb6a1ccdb32@o4512013937606656.ingest.us.sentry.io/4512412882567168",
     "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAF8bwQRvvc7yEktK",
     "TURNSTILE_HOSTNAME": "hikaido.pl4rd.com",
     "LOCAL_TEST_MODE": "false"

@@ -21,6 +21,7 @@
   "dependencies": {
     "@lucide/svelte": "^1.70.0",
     "@resvg/resvg-wasm": "^2.6.2",
+    "@sentry/sveltekit": "^11.11.0",
     "@sveltejs/adapter-cloudflare": "latest",
     "@sveltejs/kit": "latest",
     "drizzle-orm": "latest",

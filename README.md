@@ -116,6 +116,18 @@ pnpm admin notifications retry
 
 ## 本番デプロイ
 
+### Sentry
+
+mogtteと同じSentry組織に、独立した`hikaido`プロジェクトを用意します。ブラウザとWorkersの予期しない例外、APIの通信障害と5xxを収集し、想定内の4xxは通知しません。Tracing・Replay・Logsは無効です。送信前に入力内容・認証情報・パンくず・任意の追加データを除去し、例外メッセージを固定文言へ置換します。例外型とソース位置を中心に調査します。
+
+接続先は組織`pl4rd`のプロジェクト`hikaido`です。`PUBLIC_SENTRY_DSN`は`wrangler.jsonc`の公開varsに設定し、SvelteKitからブラウザへ渡します。空なら送信しません。ローカルの`.dev.vars`では`PUBLIC_SENTRY_DSN=`で上書きし、送信を試すときだけDSNを設定します。ソースマップのアップロードには`.env.local`またはビルド環境へ`SENTRY_AUTH_TOKEN`・`SENTRY_ORG=pl4rd`・`SENTRY_PROJECT=hikaido`を設定します。認証トークンはGitやクライアント、Workersのvarsへ含めません。3項目が揃ったときだけアップロードし、Sentryプラグインがアップロード後のソースマップを削除します。
+
+```sh
+SENTRY_ORG=pl4rd SENTRY_PROJECT=hikaido pnpm build
+```
+
+本番公開後はブラウザとWorkerの無害なテスト例外を各1件送信し、hikaidoプロジェクトへの到着・TypeScript/Svelteのソース位置・秘密や入力内容が含まれないことを確認します。テスト用の公開エンドポイントは追加しません。通報通知のOutbox滞留は別途確認が必要です。
+
 本番リソース作成とデプロイには事前確認が必要です。GitHubへのpushは利用者から明示的な指示を受けた場合に行います。
 
 承認後、Cloudflare `PhantomL4rd` アカウントを確認し、D1作成・ID差し替え・Secret設定・Turnstile設定・リモートマイグレーションを終えてから実行します。

@@ -1,7 +1,19 @@
 import { env, waitUntil } from "cloudflare:workers";
+import {
+  handleErrorWithSentry,
+  initCloudflareSentryHandle,
+  sentryHandle,
+} from "@sentry/sveltekit";
 import { error } from "@sveltejs/kit";
-import type { Handle } from "@sveltejs/kit/hooks";
-export const handle: Handle = async ({ event, resolve }) => {
+import {
+  type Handle,
+  type HandleServerError,
+  sequence,
+} from "@sveltejs/kit/hooks";
+import { sentryPrivacy } from "#lib/sentry";
+import { PUBLIC_SENTRY_DSN } from "$app/env/public";
+
+const handleApplication: Handle = async ({ event, resolve }) => {
   event.locals.env = env;
   event.locals.waitUntil = waitUntil;
   let request = event.request;
@@ -46,4 +58,19 @@ export const handle: Handle = async ({ event, resolve }) => {
   )
     r.headers.set("cache-control", "private, no-store");
   return r;
+};
+
+export const handle = sequence(
+  initCloudflareSentryHandle({
+    dsn: PUBLIC_SENTRY_DSN,
+    enabled: Boolean(PUBLIC_SENTRY_DSN),
+    ...sentryPrivacy,
+  }),
+  sentryHandle(),
+  handleApplication,
+);
+
+const reportError = handleErrorWithSentry<HandleServerError>(() => {});
+export const handleError: HandleServerError = (input) => {
+  if (input.kind === "unknown") return reportError(input);
 };

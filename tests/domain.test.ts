@@ -27,6 +27,28 @@ describe("診断", () => {
   });
 });
 describe("問題", () => {
+  it("すべてのテンプレートを一意のIDで識別できる", () => {
+    expect(new Set(templates.map((q) => q.id)).size).toBe(templates.length);
+  });
+  it("同じ二択の設問を重複して出題しない", () => {
+    const pairs = templates.map((q) =>
+      [q.choiceA, q.choiceB].sort().join("\n"),
+    );
+    expect(new Set(pairs).size).toBe(templates.length);
+    expect(templates.some((q) => ["t009", "t010", "t028"].includes(q.id))).toBe(
+      false,
+    );
+  });
+  it("追加の17問を通常問題として選べる", () => {
+    const added = templates.filter((q) =>
+      Array.from(
+        { length: 17 },
+        (_, i) => `t${String(81 + i).padStart(3, "0")}`,
+      ).includes(q.id),
+    );
+    expect(added).toHaveLength(17);
+    expect(added.every((q) => q.type === "normal")).toBe(true);
+  });
   for (const n of [10, 25] as const)
     it(`${n}問は重複なし診断4問`, () => {
       const d = makeDraft(n);

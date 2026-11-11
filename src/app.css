@@ -8,7 +8,9 @@
   --border: #bcc0cc;
   --text: #4c4f69;
   --muted: #5c5f77;
-  --accent: #8839ef;
+  --accent: #dd7878;
+  --accent-text: #a34545;
+  --on-accent: #24273a;
   --pink: #ea76cb;
   --blue: #1e66f5;
   --danger: #d20f39;
@@ -23,7 +25,9 @@
   --border: #5b6078;
   --text: #cad3f5;
   --muted: #b8c0e0;
-  --accent: #c6a0f6;
+  --accent: #f0c6c6;
+  --accent-text: var(--accent);
+  --on-accent: var(--base);
   --pink: #f5bde6;
   --blue: #8aadf4;
   --danger: #ed8796;
@@ -45,7 +49,7 @@ textarea {
   font: inherit;
 }
 a {
-  color: var(--accent);
+  color: var(--accent-text);
   text-underline-offset: 4px;
 }
 button,
@@ -74,7 +78,7 @@ button:disabled {
 }
 .primary {
   background: var(--accent);
-  color: var(--base);
+  color: var(--on-accent);
   border-color: var(--accent);
 }
 .danger {
@@ -203,7 +207,7 @@ footer a {
   padding: 24px 0 36px;
 }
 .eyebrow {
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 12px;
   letter-spacing: 0.14em;
   font-weight: 700;
@@ -287,7 +291,7 @@ progress {
   text-align: center;
   min-height: 40px;
   padding: 10px;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 750;
   font-size: 1.2rem;
 }
@@ -298,7 +302,7 @@ progress {
   color: var(--danger);
 }
 .success {
-  color: var(--accent);
+  color: var(--accent-text);
   text-align: center;
 }
 .pill {
@@ -316,7 +320,7 @@ progress {
 }
 .score {
   font-size: 4rem;
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 800;
   line-height: 1.3;
 }
@@ -374,7 +378,7 @@ progress {
   background: var(--surface);
   border-radius: 50%;
   margin-right: 12px;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 @media (max-width: 450px) {
   main {
@@ -406,7 +410,7 @@ progress {
   gap: 8px;
 }
 .brand svg {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 .drawer nav a {
   display: flex;

@@ -397,3 +397,38 @@ it("結果共有は本人だけが発行でき、公開値だけを返し、回�
       .first("n"),
   ).toBe(0);
 });
+
+it("通常問題の回答も公開時の診断タイプに保存する", async () => {
+  for (const [answer, expected] of [
+    ["A", "battle"],
+    ["B", "craft"],
+  ] as const) {
+    const { id } = await publish(
+      event({
+        characterName: "ひろし",
+        managementToken: "m".repeat(64),
+        questions: [
+          "t001",
+          "t002",
+          "t003",
+          "t004",
+          "t029",
+          "t032",
+          "t005",
+          "t059",
+          "t065",
+          "t015",
+        ].map((templateId) => ({
+          templateId,
+          answer: templateId === "t005" ? answer : "A",
+        })),
+      }),
+    );
+    const saved = await config.DB.prepare(
+      "SELECT hikansen_type FROM quizzes WHERE id = ?",
+    )
+      .bind(id)
+      .first<{ hikansen_type: string }>();
+    expect(saved?.hikansen_type).toBe(expected);
+  }
+});

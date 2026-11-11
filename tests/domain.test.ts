@@ -11,14 +11,57 @@ import {
 import { templates } from "../src/lib/templates";
 
 describe("診断", () => {
+  it("固定4問が同じでも通常問題の回答で診断が変わる", () => {
+    const questions = [
+      "t001",
+      "t002",
+      "t003",
+      "t004",
+      "t029",
+      "t032",
+      "t005",
+    ].map((id) => ({
+      ...templates.find((q) => q.id === id)!,
+      answer: "A" as const,
+    }));
+    expect(diagnose(questions)).toBe("battle");
+    expect(diagnose(questions.map(({ id, answer }) => ({ id, answer })))).toBe(
+      "battle",
+    );
+    expect(
+      diagnose(
+        questions.map((q) => ({
+          ...q,
+          answer: q.id === "t005" ? ("B" as const) : q.answer,
+        })),
+      ),
+    ).toBe("craft");
+  });
+  it("すべての設問に8タイプ分の非負の採点を定義する", () => {
+    for (const q of templates) {
+      for (const choice of ["A", "B"] as const) {
+        expect(q.typeScores?.[choice]).toHaveLength(8);
+        expect(
+          q.typeScores?.[choice].every(
+            (score) => Number.isInteger(score) && score >= 0,
+          ),
+        ).toBe(true);
+        expect(q.typeScores?.[choice].some((score) => score > 0)).toBe(true);
+      }
+    }
+  });
+
   it("16通りで各タイプへ2回到達し再現可能", () => {
     const counts = new Map();
     for (let i = 0; i < 16; i++) {
       const a = Array.from({ length: 4 }, (_, j) =>
         (i >> j) & 1 ? "B" : "A",
       ) as ("A" | "B")[];
-      const t = diagnose(a);
-      expect(diagnose(a)).toBe(t);
+      const questions = templates
+        .slice(0, 4)
+        .map((q, j) => ({ ...q, answer: a[j] }));
+      const t = diagnose(questions);
+      expect(diagnose(questions)).toBe(t);
       counts.set(t, (counts.get(t) || 0) + 1);
     }
     expect(counts.size).toBe(8);

@@ -132,7 +132,7 @@ export async function publish(e: ServiceEvent) {
       id,
       characterName: data.characterName,
       questionCount: n,
-      hikansenType: diagnose(chosen.slice(0, 4).map((q) => q.answer)),
+      hikansenType: diagnose(chosen),
       managementTokenHash: await hash(data.managementToken),
       createdAt: Date.now(),
     }),

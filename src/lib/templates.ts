@@ -828,3 +828,66 @@ export const diagnosisScores = [
   { A: [1, 0, 1, 0, 1, 0, 1, 0], B: [0, 1, 0, 1, 0, 1, 0, 1] },
 ] as const;
 for (let i = 0; i < 4; i++) templates[i].typeScores = diagnosisScores[i];
+
+const typeIndex = {
+  battle: 0,
+  story: 1,
+  fashion: 2,
+  housing: 3,
+  craft: 4,
+  social: 5,
+  explorer: 6,
+  collector: 7,
+} as const;
+type TypeId = keyof typeof typeIndex;
+const categoryTypes: Record<string, TypeId> = {
+  バトル: "battle",
+  ジョブ: "battle",
+  PvP: "battle",
+  物語: "story",
+  装い: "fashion",
+  キャラ: "fashion",
+  撮影: "fashion",
+  住居: "housing",
+  製作: "craft",
+  採集: "craft",
+  日課: "craft",
+  交流: "social",
+  音楽: "social",
+  探索: "explorer",
+  収集: "collector",
+};
+const choiceTypes: Partial<Record<string, readonly [TypeId, TypeId]>> = {
+  t005: ["battle", "craft"],
+  t026: ["social", "battle"],
+  t031: ["craft", "collector"],
+  t035: ["craft", "explorer"],
+  t043: ["collector", "fashion"],
+  t044: ["fashion", "explorer"],
+  t049: ["housing", "collector"],
+  t050: ["housing", "social"],
+  t052: ["battle", "social"],
+  t057: ["social", "fashion"],
+  t063: ["battle", "explorer"],
+  t064: ["social", "battle"],
+  t069: ["collector", "craft"],
+  t070: ["fashion", "collector"],
+  t071: ["battle", "explorer"],
+  t072: ["craft", "social"],
+  t075: ["story", "social"],
+  t076: ["fashion", "story"],
+  t079: ["battle", "explorer"],
+  t089: ["social", "housing"],
+  t091: ["social", "battle"],
+  t096: ["craft", "explorer"],
+};
+for (const question of templates.filter((q) => q.type === "normal")) {
+  const category = categoryTypes[question.category];
+  if (!category)
+    throw new Error(`診断カテゴリが未定義です: ${question.category}`);
+  const [a, b] = choiceTypes[question.id] ?? [category, category];
+  question.typeScores = {
+    A: Object.values(typeIndex).map((i) => Number(i === typeIndex[a])),
+    B: Object.values(typeIndex).map((i) => Number(i === typeIndex[b])),
+  };
+}

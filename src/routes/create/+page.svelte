@@ -53,9 +53,10 @@ $effect(() => {
 });
 const current = $derived(draft[position]);
 const type = $derived(
-  draft.length && draft.slice(0, 4).every((q) => q.answer)
+  draft.length && draft.every((q) => q.answer)
     ? types.find(
-        (t) => t.id === diagnose(draft.slice(0, 4).map((q) => q.answer!)),
+        (t) =>
+          t.id === diagnose(draft.map((q) => ({ ...q, answer: q.answer! }))),
       )
     : undefined,
 );

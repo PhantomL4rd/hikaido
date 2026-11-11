@@ -63,12 +63,18 @@ export function chooseType(scores: readonly number[]) {
     throw new Error("タイプ別スコアが不正です");
   return types[scores.indexOf(Math.max(...scores))].id;
 }
-export function diagnose(answers: readonly Choice[]) {
-  if (answers.length !== 4) throw new Error("診断には4問必要です");
-  const questions = templates.filter((q) => q.type === "diagnosis");
+export function diagnose(answers: readonly { id: string; answer: Choice }[]) {
+  const questions = answers.map(({ id, answer }) => {
+    const template = templates.find((q) => q.id === id);
+    if (!template) throw new Error("未登録の問題です");
+    return { ...template, answer };
+  });
+  if (questions.filter((q) => q.type === "diagnosis").length !== 4)
+    throw new Error("診断には固定4問が必要です");
   const scores = types.map((_, i) =>
-    answers.reduce(
-      (score, answer, j) => score + (questions[j].typeScores?.[answer][i] ?? 0),
+    questions.reduce(
+      (score, question) =>
+        score + (question.typeScores?.[question.answer][i] ?? 0),
       0,
     ),
   );

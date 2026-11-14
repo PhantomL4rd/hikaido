@@ -59,6 +59,9 @@ a {
   color: var(--text);
   text-underline-offset: 4px;
 }
+footer a {
+  color: inherit;
+}
 button,
 .button {
   cursor: pointer;
@@ -155,38 +158,101 @@ header {
 .between {
   justify-content: space-between;
 }
-.icon-button {
+.menu-button {
   border: 0;
+  border-radius: 8px;
   background: transparent;
   padding: 8px;
-  min-width: 40px;
-  min-height: 40px;
+  min-width: 36px;
+  min-height: 36px;
+  line-height: 20px;
+}
+.menu-button:hover {
+  background: var(--border);
 }
 .drawer {
   position: fixed;
   inset: 0 0 0 auto;
   margin: 0;
-  width: min(320px, 88vw);
+  width: min(256px, 100vw);
+  max-width: 100vw;
   height: 100dvh;
   max-height: none;
   border: 0;
-  border-left: 1px solid var(--border);
-  padding: 16px;
+  padding: 0;
   background: var(--card);
   color: var(--text);
+  font-family:
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 16px;
+  line-height: 24px;
+  box-shadow:
+    0 20px 25px -5px #0000001a,
+    0 8px 10px -6px #0000001a;
+  overscroll-behavior: contain;
 }
 .drawer::backdrop {
-  background: #18192699;
+  background: #00000080;
+}
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.drawer-header strong {
+  font-weight: 700;
+}
+.drawer nav {
+  padding: 8px;
 }
 .drawer nav a {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 12px;
   border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
   text-decoration: none;
   color: var(--text);
 }
+.drawer svg {
+  flex-shrink: 0;
+}
 .drawer nav a:hover {
-  background: var(--surface);
+  background: var(--border);
+}
+.drawer-section-label {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drawer {
+    translate: 100% 0;
+    transition:
+      translate 300ms ease-out,
+      display 300ms,
+      overlay 300ms;
+    transition-behavior: allow-discrete;
+  }
+  .drawer[open] {
+    translate: 0 0;
+  }
+  @starting-style {
+    .drawer[open] {
+      translate: 100% 0;
+    }
+  }
+  .drawer nav a,
+  .menu-button {
+    transition: background-color 150ms;
+  }
 }
 main {
   width: min(100% - 32px, 720px);
@@ -198,9 +264,6 @@ footer {
   color: var(--muted);
   font-size: 12px;
   padding: 24px 16px;
-}
-footer a {
-  color: inherit;
 }
 .hero {
   text-align: center;
@@ -422,11 +485,6 @@ progress {
 }
 .brand svg {
   color: var(--text);
-}
-.drawer nav a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 .reroll-button {
   padding: 8px 12px;

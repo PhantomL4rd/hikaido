@@ -45,12 +45,12 @@ onMount(() => {
     <div class="row">
       <button
         type="button"
-        class="icon-button"
+        class="menu-button"
         onclick={() => drawer.showModal()}
         aria-label="メニューを開く"
         disabled={!ready}
       >
-        <Icon name="Menu" size={22} />
+        <Icon name="Menu" strokeWidth={2} />
       </button>
     </div>
   </div>
@@ -59,44 +59,64 @@ onMount(() => {
   bind:this={drawer}
   class="drawer"
   onclick={(e) => {
-    if (e.target === drawer) drawer.close();
+    if (e.target !== drawer) return;
+    const rect = drawer.getBoundingClientRect();
+    if (
+      e.clientX < rect.left ||
+      e.clientX > rect.right ||
+      e.clientY < rect.top ||
+      e.clientY > rect.bottom
+    )
+      drawer.close();
   }}
   onkeydown={(e) => {
     if (e.key === "Escape") drawer.close();
   }}
   aria-label="メニュー"
 >
-  <div class="row between">
+  <div class="drawer-header">
     <strong>メニュー</strong
     ><button
       type="button"
-      class="icon-button"
+      class="menu-button"
       onclick={() => drawer.close()}
       aria-label="メニューを閉じる"
     >
-      <Icon name="X" />
+      <Icon name="X" strokeWidth={2} />
     </button>
   </div>
-  <nav>
+  <nav aria-label="サイトナビゲーション">
     {#each navigation as [path, label, icon]}
-      <a href={`${base}${path}`} onclick={() => drawer.close()}
-        ><Icon name={icon} />{label}</a
+      <a
+        href={`${base}${path}`}
+        onclick={() => drawer.close()}
+        aria-current={page.url.pathname === `${base}${path}`
+          ? "page"
+          : undefined}
+        ><Icon name={icon} strokeWidth={2} />{label}</a
       >
     {/each}
+    <p class="drawer-section-label">外部リンク</p>
+    <a
+      href="https://pl4rd.com/"
+      target="_blank"
+      rel="noopener noreferrer"
+      onclick={() => drawer.close()}
+      ><Icon name="House" strokeWidth={2} />ホーム</a
+    >
+    <a
+      href="https://pl4rd.com/privacy"
+      target="_blank"
+      rel="noopener noreferrer"
+      onclick={() => drawer.close()}
+      ><Icon name="VenetianMask" strokeWidth={2} />プライバシーポリシー</a
+    >
     <a
       href="https://contact.pl4rd.com/?service=hikaido"
+      target="_blank"
+      rel="noopener noreferrer"
       onclick={() => drawer.close()}
-      ><Icon name="Mail" />お問い合わせ</a
-    >
-    <hr>
-    <small>リンク</small
-    ><a href="https://pl4rd.com/" target="_blank" rel="noreferrer"
-      ><Icon name="House" />ホーム<Icon name="ExternalLink" size={14} /></a
-    ><a href="https://pl4rd.com/privacy" target="_blank" rel="noreferrer"
-      ><Icon name="Shield" />プライバシーポリシー<Icon
-        name="ExternalLink"
-        size={14}
-      /></a
+      ><Icon name="MessageCircle" strokeWidth={2} />お問い合わせ</a
     >
   </nav>
 </dialog>

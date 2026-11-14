@@ -15,6 +15,7 @@ import {
   List,
   Mail,
   Menu,
+  MessageCircle,
   MessagesSquare,
   Moon,
   Plus,
@@ -25,6 +26,7 @@ import {
   Sun,
   Swords,
   Trash2,
+  VenetianMask,
   X,
 } from "@lucide/svelte";
 
@@ -44,6 +46,7 @@ const icons = {
   List,
   Mail,
   Menu,
+  MessageCircle,
   MessagesSquare,
   Moon,
   Plus,
@@ -54,9 +57,14 @@ const icons = {
   Sun,
   Swords,
   Trash2,
+  VenetianMask,
   X,
 };
-let { name, size = 20 }: { name: keyof typeof icons; size?: number } = $props();
+let {
+  name,
+  size = 20,
+  strokeWidth = 1.8,
+}: { name: keyof typeof icons; size?: number; strokeWidth?: number } = $props();
 const Glyph = $derived(icons[name]);
 </script>
-<Glyph {size} strokeWidth={1.8} aria-hidden="true" focusable="false" />
+<Glyph {size} {strokeWidth} aria-hidden="true" focusable="false" />

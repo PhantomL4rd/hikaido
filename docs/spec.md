@@ -73,6 +73,8 @@ Catppuccin Latte/Macchiatoを採用。カララントピッカー・4seasonsと�
 
 ## 共通ヘッダーと配色設定
 
+サイドドロワーはcolorant-picker・mirapri-stats・4seasonsの共通デザインに揃える。幅256px（画面幅を上限）、背景mantle、黒50%のバックドロップ、右端の影とする。見出しは16px・太字、16pxの内側余白と下境界線、閉じるボタンは36px。ナビゲーションの外側余白は8px、各リンクは14px／行高20px・内側余白12px・アイコン20px・間隔12px・角丸8px、ホバーはsurface1。外部リンク見出しは12px／行高16pxとし、4seasons・mirapri-statsと同様に区切り線を置かない。ホーム・プライバシーポリシー・お問い合わせを外部リンクとしてまとめ、House・VenetianMask・MessageCircleを使う。外部リンクは別タブで開き、ドロワーを閉じる。native dialogによるフォーカス制御・Escape・背景クリックでの閉じる操作を維持し、内部の余白クリックでは閉じない。開閉は300msのスライドとし、reduced-motionでは省略する。
+
 最上部の非公式サービス・無料・ログイン不要の帯は表示しない。ライト／ダークはmode-watcherで管理する。OS設定とその変更に追従する。ヘッダーの明度切り替えボタンとメニュー内の配色設定は表示しない。過去に保存した手動設定はmode-watcherのresetModeでOS設定に戻す。初期描画前の配色適用とブラウザのtheme-color更新もmode-watcherに任せる。
 
 ## 共通お問い合わせへの移行
